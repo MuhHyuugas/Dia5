@@ -1,6 +1,6 @@
 <div align="center">
   
-# 💸 SplitExpense - Sistema de Divisão de Despesas
+# 💸 Dia5
 
 [![.NET](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](#)
 [![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](#)
@@ -14,7 +14,7 @@
 
 ## 📌 Sobre o Projeto
 
-O **SplitExpense** (codinome temporário) é um aplicativo projetado para resolver o problema clássico de "quem deve a quem" em rolês, viagens e na convivência diária. Diferente de soluções comuns, ele possui a funcionalidade de **Shadow Users** (Usuários Convidados), permitindo adicionar amigos que não têm o app na divisão de contas, e depois vincular o histórico deles quando decidirem se cadastrar.
+O **Dia5** é um aplicativo projetado para resolver o problema clássico de "quem deve a quem" em rolês, viagens e na convivência diária. Diferente de soluções comuns, ele possui a funcionalidade de **Shadow Users** (Usuários Convidados), permitindo adicionar amigos que não têm o app na divisão de contas, e depois vincular o histórico deles quando decidirem se cadastrar.
 
 ## 🚀 Principais Funcionalidades
 

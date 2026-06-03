@@ -1,4 +1,4 @@
-# Documentação de Requisitos - Sistema de Divisão de Despesas
+# Documentação de Requisitos - Dia5
 
 ## 📋 Requisitos Funcionais (RF)
 
