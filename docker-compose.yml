@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: dia5_postgres
+    environment:
+      POSTGRES_USER: dia5_user
+      POSTGRES_PASSWORD: dia5_password
+      POSTGRES_DB: dia5_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - dia5_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: dia5_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@dia5.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  dia5_data:
