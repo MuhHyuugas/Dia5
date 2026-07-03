@@ -1,0 +1,6 @@
+{
+  "name": "SplitWise Premium",
+  "description": "Uma experiência premium e moderna para dividir despesas e gerenciar finanças entre amigos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
