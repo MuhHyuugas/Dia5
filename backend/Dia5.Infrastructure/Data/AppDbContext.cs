@@ -97,5 +97,9 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(u => u.CriadoPorId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        // Soft Delete global para Despesas
+        modelBuilder.Entity<Despesa>()
+            .HasQueryFilter(d => d.DeletedAt == null);
     }
 }
