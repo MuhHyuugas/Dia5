@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="Dia5.API/Dia5.API.csproj" />
   <Project Path="Dia5.Application/Dia5.Application.csproj" />
+  <Project Path="Dia5.Domain.Tests/Dia5.Domain.Tests.csproj" />
   <Project Path="Dia5.Domain/Dia5.Domain.csproj" />
   <Project Path="Dia5.Infrastructure/Dia5.Infrastructure.csproj" />
 </Solution>

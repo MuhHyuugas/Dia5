@@ -18,4 +18,13 @@ public class Despesa
     public DateTime? DeletedAt { get; set; }
 
     public ICollection<ParticipanteDespesa> Participantes { get; set; } = new List<ParticipanteDespesa>();
+
+    public  void Validar(){
+        var somaPartes = Participantes.Sum(p => p.ValorDevido);
+
+        if (somaPartes != ValorTotal)
+        {
+            throw new InvalidOperationException("A soma das partes deve ser igual ao valor total.");
+        }
+    }
 }

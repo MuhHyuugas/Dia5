@@ -1,110 +1,92 @@
-# Roteiro de Implementação - Dia5
+# Plano de Desenvolvimento Mapeado por Issues (Fase 1 e 2)
 
-Este documento apresenta o plano passo a passo para o desenvolvimento completo do **Dia5**, abrangendo a configuração do ambiente, o desenvolvimento do backend (.NET 10), regras de negócio críticas e a criação do frontend (React Native).
-
----
-
-## 🏗️ Visão Geral da Arquitetura
-
-O sistema é dividido em duas partes principais:
-1. **Backend (.NET 10 API)** utilizando **Clean Architecture** (Domain, Application, Infrastructure, API) com banco PostgreSQL via Entity Framework Core.
-2. **Frontend (React Native)** utilizando Expo ou CLI, consumindo a API REST do backend.
-
-```mermaid
-graph TD
-    subgraph Frontend (React Native)
-        UI[Telas / Componentes] --> State[Gerenciador de Estado / Contexts]
-        State --> Services[API Services / Axios]
-    end
-
-    subgraph Backend (.NET 10 API)
-        Services --> API[API Layer / Controllers]
-        API --> App[Application Layer / Services]
-        App --> Domain[Domain Layer / Entities & Rules]
-        App --> Infra[Infrastructure Layer / EF Core]
-        Infra --> PostgreSQL[(PostgreSQL Database)]
-    end
-```
+Este plano alinha a execução com as 10 issues definidas para o desenvolvimento do **Dia5**. Ele divide as tarefas em fases e mapeia o status de cada item para termos total controle e rastreabilidade.
 
 ---
 
-## 📅 Roteiro de Desenvolvimento (Fases)
-
-### Fase 1: Setup do Ambiente e Banco de Dados (Infraestrutura)
-- [x ] **Instalação do SDK:** Concluir a instalação do .NET SDK 10.0.
-- [ ] **Banco de Dados (Docker):** Subir o banco de dados PostgreSQL e o pgAdmin através do Docker Compose disponível em [docker-compose.yml](file:///c:/Users/bcaet/OneDrive/Desktop/dev/dia5/docs/docker-compose.yml).
-- [ ] **Restaurar Dependências:** Executar o comando `dotnet restore` no diretório do backend para validar a instalação dos pacotes NuGet do C#.
-- [ ] **Configuração do Projeto:** Ajustar a Connection String no arquivo `appsettings.Development.json` na API do backend para apontar para o PostgreSQL do Docker.
-
----
-
-### Fase 2: Modelagem e Persistência do Domínio (Backend)
-- [ ] **Entidades do Domínio (Domain):**
-  - Implementar as classes em `Dia5.Domain`: `Usuario`, `Grupo`, `Despesa`, `ParticipanteDespesa`, `Pagamento`.
-  - Garantir o tratamento correto do tipo `is_guest` (Shadow Users) e relacionamentos autorreferenciados (como o criador do Shadow User e a tabela de amizades).
-- [ ] **Banco de Dados e Contexto (Infrastructure):**
-  - Configurar o `AppDbContext` em `Dia5.Infrastructure`.
-  - Definir mapeamentos com **Fluent API** para chaves primárias compostas (`MembrosGrupo`, `Amizades`, `ParticipantesDespesa`) e configurações de chaves estrangeiras.
-  - Habilitar o comportamento de exclusão lógica (**Soft Delete**) global para a entidade `Despesa` (usando filtros de consulta do EF Core para ignorar deletados automaticamente).
-- [ ] **Migrações:** Gerar e aplicar a primeira migração com o comando `dotnet ef database update`.
-
----
-
-### Fase 3: Casos de Uso e Regras de Negócio (Application / API)
-- [ ] **Autenticação e Perfis (UC01 / UC06 / UC07):**
-  - Cadastro de usuários reais com hash criptográfico de senha (BCrypt ou similar).
-  - Geração de códigos de perfil exclusivos (alfanumérico de 6 dígitos) para amizades.
-  - Implementação de JWT para proteger as rotas da API.
-- [ ] **Gestão de Grupos e Participantes (UC04 / UC05):**
-  - Criação de grupos e geração de código de convite de 6 caracteres.
-  - Entrada de usuários em grupos por código de convite.
-  - Criação de "Shadow Users" (convidados sem senha ou e-mail, vinculados ao criador).
-- [ ] **Gestão Financeira e Divisão de Despesas (UC01 / UC02 / UC08):**
-  - **Lógica de Divisão Matemática:** Validação rigorosa na criação de despesa para garantir que a soma das frações devidas pelos participantes seja igual ao valor total do cabeçalho.
-  - **Soft Delete de Despesa:** Lógica no serviço para marcar `deleted_at` em vez de remover fisicamente, recalculando os saldos devidos.
-  - **Motor de Balanço e Ledger:** Queries eficientes no banco para cruzar e liquidar as despesas e pagamentos, retornando:
-    - O saldo consolidado de um grupo específico.
-    - O balanço global cruzado entre dois amigos (cobrindo múltiplos grupos).
-- [ ] **Vinculação Atômica do Shadow User (UC03):**
-  - Implementar uma transação de banco de dados (`IDbContextTransaction`) que substitua o ID do Shadow User pelo ID do Usuário Real em todos os registros financeiros pendentes, invalidando o Shadow User ao final de forma atômica.
-
----
-
-### Fase 4: Desenvolvimento do Frontend (React Native + Expo)
-- [ ] **Setup do Projeto com Expo e FSD:**
-  - Inicializar o projeto React Native com **Expo** (utilizando TypeScript).
-  - Estruturar a pasta `src/` seguindo a arquitetura **Feature-Sliced Design (FSD)**:
-    - `src/app/`: Provedores globais, estilos globais e inicialização.
-    - `src/pages/`: Telas da aplicação (ex: Login, Dashboard, Detalhe do Grupo, Amigos).
-    - `src/widgets/`: Blocos compostos de UI (ex: Feed de Despesas, Painel de Balanço).
-    - `src/features/`: Ações interativas do usuário (ex: criar despesa, entrar em grupo com código, vincular shadow user).
-    - `src/entities/`: Estado, hooks e tipos das entidades de negócio (`user`, `group`, `expense`, `payment`).
-    - `src/shared/`: Componentes base (Botões, Inputs), utilitários e cliente da API (Axios).
-  - Configurar caminhos absolutos (`tsconfig.json` e `babel.config.js`) para importar usando aliases como `@/shared`, `@/entities`, etc.
-- [ ] **Navegação (Expo Router):**
-  - Configurar a pasta `app/` nativa do Expo Router como uma camada de roteamento limpa que apenas importa e renderiza as telas definidas em `src/pages/`.
-  - Definir fluxos de autenticação (Login/Cadastro) e rotas protegidas (Tab Navigation para Dashboard, Grupos, Amigos e Perfil).
-- [ ] **Telas Core (Implementadas em `src/pages` e compostas por `widgets`/`features`):**
-  - **Login / Cadastro:** Autenticação JWT e exibição do código de perfil exclusivo de 6 dígitos.
-  - **Lista de Grupos:** Listagem de grupos e ações de criação/entrada via código.
-  - **Detalhe do Grupo (Feed):** Linha do tempo de despesas, saldos internos e atalhos de gerenciamento.
-  - **Adicionar Despesa:** Formulário interativo de lançamento e divisão de gastos com cálculo dinâmico.
-  - **Balanço Global & Amigos:** Controle de dívidas cruzadas e liquidação de pendências.
-  - **Vincular Usuário Convidado:** Interface para o criador do Shadow User realizar a fusão de históricos inserindo o código de perfil real.
-- [ ] **Integração de APIs (Axios em `src/shared/api`):**
-  - Configuração do Axios com interceptor para renovação/envio de tokens JWT e tratamento global de erros.
-
----
-
-### Fase 5: Validação e Testes
-- [ ] **Testes de Unidade:** Validar a engine matemática de divisão de contas e a lógica de consolidação de saldos no backend.
-- [ ] **Testes de Integração:** Simular o fluxo completo de vincular um Shadow User e garantir que todos os saldos migraram corretamente de forma atômica.
-- [ ] **Verificação Manual:** Testar as requisições via arquivo `.http` ou Swagger (OpenAPI) e posteriormente a integração do app móvel.
-
----
-
-## ❓ Perguntas Abertas e Decisões
+## User Review Required
 
 > [!IMPORTANT]
-> 1. **Lógica de Divisão Inicial:** Desejamos suportar inicialmente apenas divisões **iguais** (ex: dividir em partes iguais para todos os selecionados) ou já implementar divisões customizadas (onde cada um paga um valor arbitrário diferente)?
-> 2. **Docker Desktop:** Você conseguiu iniciar o Docker Desktop para podermos subir o container do banco?
+> **Fluxo de Trabalho:**
+> 1. Concluiremos as tarefas pendentes do backend (testes de unidade de domínio das Issues 3 e 4).
+> 2. Inicializaremos o frontend mobile com Expo na pasta raiz (`mobile` ou `frontend`) seguindo a arquitetura FSD (Issue 2).
+> 3. Desenvolveremos a navegação e as telas do app móvel conforme as Issues 5 a 10.
+>
+> **Linguagem e Frameworks:**
+> - Backend: .NET 10.
+> - Frontend: React Native com Expo (TypeScript), Expo Router e estrutura de pastas FSD.
+
+---
+
+## Proposed Changes
+
+Abaixo está o mapeamento detalhado por issues e seus arquivos correspondentes.
+
+### 🏛️ Fase 1: Setup e Regras de Domínio (Backend & Mobile Inicial)
+
+#### Issue 1: [Setup] Inicialização do Back-end e Banco de Dados
+- **Status:** **100% Concluído**
+- **Arquivos:**
+  - Solução: [Dia5.slnx](file:///c:/Users/bcaet/OneDrive/Desktop/dev/dia5/backend/Dia5.slnx)
+  - Projetos e camadas em [backend/](file:///c:/Users/bcaet/OneDrive/Desktop/dev/dia5/backend)
+  - Docker Compose: [docker-compose.yml](file:///c:/Users/bcaet/OneDrive/Desktop/dev/dia5/docker-compose.yml)
+  - Documentação atualizada no [README.md](file:///c:/Users/bcaet/OneDrive/Desktop/dev/dia5/README.md)
+
+#### Issue 2: [Setup] Estruturação do Front-end Mobile com Expo
+- **Status:** **Pendente**
+- **Ações:**
+  - Criar o projeto Expo na raiz como `mobile`.
+  - Configurar Expo Router e estrutura de pastas FSD (`src/features`, `src/components`, `src/services`, `src/utils`).
+  - Adicionar o `.gitignore` adequado e tela "Hello World".
+
+#### Issue 3: [Domain] Criar entidade Despesa e regra de partilha (TDD)
+- **Status:** **100% Concluído**
+- **Arquivos e Ações:**
+  - xUnit configurado em [Dia5.Domain.Tests.csproj](file:///c:/Users/bcaet/OneDrive/Desktop/dev/dia5/backend/Dia5.Domain.Tests/Dia5.Domain.Tests.csproj).
+  - Testes de falha e de caminho feliz implementados em [DespesaTests.cs](file:///c:/Users/bcaet/OneDrive/Desktop/dev/dia5/backend/Dia5.Domain.Tests/DespesaTests.cs).
+  - Método de validação implementado na entidade [Despesa.cs](file:///c:/Users/bcaet/OneDrive/Desktop/dev/dia5/backend/Dia5.Domain/Entities/Despesa.cs).
+  - Todos os testes validados com `dotnet test` (2/2 Aprovados).
+
+#### Issue 4: [Domain] Modelagem de Usuários e Shadow Users
+- **Status:** **Em Execução (80% Concluído)**
+- **Ações:**
+  - Entidade [Usuario.cs](file:///c:/Users/bcaet/OneDrive/Desktop/dev/dia5/backend/Dia5.Domain/Entities/Usuario.cs) criada com `IsGuest` e `CriadoPorId`.
+  - **Pendente:** Escrever os testes unitários garantindo os estados corretos da entidade `Usuario` de acordo com o tipo (usuário comum vs. convidado).
+
+---
+
+### 📱 Fase 2: Telas do Front-end (React Native / Expo)
+
+#### Issue 5: [UI/Infra] Criar Navegação Global (Bottom Tab Bar)
+- **Status:** **Pendente**
+- **Ações:** Configurar `_layout.tsx` e rotas principais (Dashboard, Groups, Activity, Account) em Dark Mode.
+
+#### Issue 6: [UI/Feature] Tela Inicial (Dashboard)
+- **Status:** **Pendente**
+- **Ações:** Componentes `GlobalBalanceCard`, `InsightCard`, `GroupListItem` e renderização da tela principal.
+
+#### Issue 7: [UI/Feature] Tela de Detalhes do Grupo
+- **Status:** **Pendente**
+- **Ações:** Cabeçalho com lista de membros, `GroupSummaryCard`, feed de despesas agrupadas por data e botão flutuante.
+
+#### Issue 8: [UI/Feature] Tela de Nova Despesa (Formulário e Partilha)
+- **Status:** **Pendente**
+- **Ações:** Inputs de valor e descrição, seletor de pagador, lista "Dividido entre" destacando `[GUEST]` e lógica de divisão igualitária local.
+
+#### Issue 9: [UI/Feature] Tela de Atividades (Notificações)
+- **Status:** **Pendente**
+- **Ações:** Feed cronológico tipo timeline com ícones dinâmicos de cor para transações.
+
+#### Issue 10: [UI/Feature] Tela de Perfil e Vinculação (Account)
+- **Status:** **Pendente**
+- **Ações:** Exibição do código de perfil de 6 dígitos, botão "Copiar" e lista de opções adicionais.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+- Executar `dotnet test` no backend para validar todos os testes das Issues 3 e 4.
+
+### Manual Verification
+- Iniciar o app Expo para verificar a navegação inicial e layout básico (Issue 2).
