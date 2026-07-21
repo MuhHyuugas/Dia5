@@ -48,10 +48,11 @@ Abaixo está o mapeamento detalhado por issues e seus arquivos correspondentes.
   - Todos os testes validados com `dotnet test` (2/2 Aprovados).
 
 #### Issue 4: [Domain] Modelagem de Usuários e Shadow Users
-- **Status:** **Em Execução (80% Concluído)**
-- **Ações:**
-  - Entidade [Usuario.cs](file:///c:/Users/bcaet/OneDrive/Desktop/dev/dia5/backend/Dia5.Domain/Entities/Usuario.cs) criada com `IsGuest` e `CriadoPorId`.
-  - **Pendente:** Escrever os testes unitários garantindo os estados corretos da entidade `Usuario` de acordo com o tipo (usuário comum vs. convidado).
+- **Status:** **100% Concluído**
+- **Arquivos e Ações:**
+  - Entidade [Usuario.cs](file:///c:/Users/bcaet/OneDrive/Desktop/dev/dia5/backend/Dia5.Domain/Entities/Usuario.cs) com validações de `IsGuest` e `CriadoPorId`.
+  - Testes unitários de Usuário Real e Shadow User em [UsuarioTests.cs](file:///c:/Users/bcaet/OneDrive/Desktop/dev/dia5/backend/Dia5.Domain.Tests/UsuarioTests.cs).
+  - Validação dos 5 testes da solução com `dotnet test` (5/5 Aprovados).
 
 ---
 

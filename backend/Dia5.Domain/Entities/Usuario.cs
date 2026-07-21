@@ -19,4 +19,38 @@ public class Usuario
     public ICollection<MembroGrupo> Grupos { get; set; } = new List<MembroGrupo>();
     public ICollection<Despesa> DespesasPagas { get; set; } = new List<Despesa>();
     public ICollection<ParticipanteDespesa> ParticipacoesDespesa { get; set; } = new List<ParticipanteDespesa>();
+
+        public void Validar()
+    {
+        // 1. Todo usuário (Real ou Convidado) precisa ter um nome
+        if (string.IsNullOrWhiteSpace(Nome))
+        {
+            throw new InvalidOperationException("O nome do usuário é obrigatório.");
+        }
+
+        // 2. Regras específicas para Usuário Convidado (Shadow User)
+        if (IsGuest)
+        {
+            if (CriadoPorId == null)
+            {
+                throw new InvalidOperationException("Um usuário convidado deve obrigatoriamente ter um usuário criador.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(Email) || !string.IsNullOrWhiteSpace(SenhaHash))
+            {
+                throw new InvalidOperationException("Usuários convidados não podem possuir e-mail ou senha.");
+            }
+        }
+        // 3. Regras específicas para Usuário Real
+        else
+        {
+            if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(SenhaHash))
+            {
+                throw new InvalidOperationException("Usuários reais devem obrigatoriamente possuir e-mail e senha.");
+            }
+        }
+    }
+
+
+    
 }
