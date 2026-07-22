@@ -89,6 +89,55 @@ Todos os detalhes técnicos de especificação estão disponíveis nos seguintes
 - 🗄️ [Modelo de Dados Relacional](./modelo%20de%20dados.md)
 - 🏛️ [Arquitetura de Software](./arquitetura.md)
 
-## 🛠️ Como Executar (Em breve)
+## 🛠️ Como Executar
 
-*(As instruções de setup para a API e o app mobile serão adicionadas nesta seção assim que a fase de configuração inicial estiver concluída).*
+### 1. Banco de Dados (Docker)
+Para subir o banco de dados PostgreSQL e o pgAdmin:
+```bash
+# Iniciar os containers em background
+docker compose up -d
+
+# Parar os containers
+docker compose down
+```
+
+* **PostgreSQL:** Rodando na porta `5432` com usuário `dia5_user` e banco `dia5_db`.
+* **pgAdmin:** Acessível em `http://localhost:5050` com email `admin@dia5.com` e senha `admin`.
+
+### 2. Backend (.NET 10 API)
+Para restaurar as dependências e iniciar o servidor da API:
+```bash
+# Entrar na pasta do backend
+cd backend
+
+# Restaurar pacotes NuGet
+dotnet restore
+
+# Executar a API
+dotnet run --project Dia5.API
+```
+A API estará acessível por padrão em `http://localhost:5000` ou `https://localhost:5001`.
+
+### 3. Migrações do Entity Framework Core
+Se precisar criar ou aplicar novas migrações de banco de dados:
+```bash
+# Instalar a ferramenta CLI do EF Core globalmente (caso não possua)
+dotnet tool install --global dotnet-ef
+
+# Aplicar migrações existentes no banco de dados
+dotnet ef database update --project Dia5.Infrastructure --startup-project Dia5.API
+```
+
+### 4. Frontend (Vite + React)
+Para rodar o frontend de teste:
+```bash
+# Entrar na pasta do frontend
+cd front-teste/splitwise-premium
+
+# Instalar as dependências
+npm install
+
+# Iniciar o servidor de desenvolvimento
+npm run dev
+```
+O frontend estará acessível em `http://localhost:3000`.
