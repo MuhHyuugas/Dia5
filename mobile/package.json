@@ -23,10 +23,10 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "start": "expo start --clear",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "start": "npx expo start --clear",
+    "android": "npx expo start --android",
+    "ios": "npx expo start --ios",
+    "web": "npx expo start --web"
   },
   "private": true
 }
