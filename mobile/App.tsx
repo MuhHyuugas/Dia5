@@ -4,11 +4,13 @@ import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { authService } from './src/services/auth.service';
 
 import { LoginScreen } from './src/screens/LoginScreen';
 import { RegisterScreen } from './src/screens/RegisterScreen';
+import { OnboardingScreen } from './src/screens/OnboardingScreen';
 import { DashboardScreen } from './src/screens/DashboardScreen';
 import { GroupsScreen } from './src/screens/GroupsScreen';
 import { GroupDetailsScreen } from './src/screens/GroupDetailsScreen';
@@ -88,7 +90,7 @@ function MainTabs() {
 }
 
 export default function App() {
-  const [initialRoute, setInitialRoute] = useState<'Login' | 'MainTabs' | null>(null);
+  const [initialRoute, setInitialRoute] = useState<'Login' | 'Onboarding' | 'MainTabs' | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -96,7 +98,17 @@ export default function App() {
 
   const checkAuth = async () => {
     const isAuth = await authService.isAuthenticated();
-    setInitialRoute(isAuth ? 'MainTabs' : 'Login');
+    if (!isAuth) {
+      setInitialRoute('Login');
+      return;
+    }
+
+    const hasSeenTutorial = await AsyncStorage.getItem('@dia5_has_seen_tutorial');
+    if (!hasSeenTutorial) {
+      setInitialRoute('Onboarding');
+    } else {
+      setInitialRoute('MainTabs');
+    }
   };
 
   if (!initialRoute) {
@@ -113,6 +125,7 @@ export default function App() {
       <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="MainTabs" component={MainTabs} />
         <Stack.Screen name="GroupDetails" component={GroupDetailsScreen} />
         <Stack.Screen name="AddExpense" component={AddExpenseScreen} />

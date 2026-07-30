@@ -3,14 +3,17 @@ import { authService } from '../services/auth.service';
 import { usersService } from '../services/users.service';
 import type { UserProfile } from '../services/users.service';
 import { Modal } from '../components/Modal';
-import { Mail, Copy, Check, Link2, LogOut, KeyRound } from 'lucide-react';
+import { TutorialModal } from '../components/TutorialModal';
+import { Mail, Copy, Check, Link2, LogOut, KeyRound, HelpCircle } from 'lucide-react';
 
 export const Account: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Modal Vincular Perfil Fantasma
+  // Modais
   const [isLinkOpen, setIsLinkOpen] = useState(false);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+
   const [shadowUserId, setShadowUserId] = useState('');
   const [codigoPerfilReal, setCodigoPerfilReal] = useState('');
 
@@ -120,6 +123,23 @@ export const Account: React.FC = () => {
           </section>
 
           <section className="bg-surface rounded-3xl border border-outline shadow-sm overflow-hidden divide-y divide-outline">
+            {/* Ver Tutorial de Uso */}
+            <div
+              onClick={() => setIsTutorialOpen(true)}
+              className="p-5 flex items-center justify-between hover:bg-background/50 transition-colors cursor-pointer active:bg-background"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="p-3 bg-secondary/10 text-secondary rounded-2xl">
+                  <HelpCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-on-surface">Ver Tutorial de Uso</h3>
+                  <p className="text-xs text-on-surface-variant">Aprenda os passos principais para utilizar o aplicativo.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Vincular Perfil Fantasma */}
             <div
               onClick={() => setIsLinkOpen(true)}
               className="p-5 flex items-center justify-between hover:bg-background/50 transition-colors cursor-pointer active:bg-background"
@@ -135,6 +155,7 @@ export const Account: React.FC = () => {
               </div>
             </div>
 
+            {/* Logout */}
             <div
               onClick={() => authService.logout()}
               className="p-5 flex items-center justify-between hover:bg-error/5 transition-colors cursor-pointer text-error"
@@ -153,6 +174,10 @@ export const Account: React.FC = () => {
         </>
       )}
 
+      {/* Tutorial Modal */}
+      <TutorialModal isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
+
+      {/* Modal: Vincular Perfil Fantasma */}
       <Modal isOpen={isLinkOpen} onClose={() => setIsLinkOpen(false)} title="Vincular Perfil Fantasma a Conta Real">
         <form onSubmit={handleLinkShadowUser} className="space-y-4">
           {error && <div className="text-xs text-error bg-error/10 p-3 rounded-xl">{error}</div>}

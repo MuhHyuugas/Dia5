@@ -8,11 +8,10 @@ import {
   TextInput,
   ActivityIndicator,
   SafeAreaView,
-  Alert,
 } from 'react-native';
 import { authService } from '../services/auth.service';
 import { usersService, UserProfile } from '../services/users.service';
-import { Mail, KeyRound, Link2, LogOut, X } from 'lucide-react-native';
+import { Mail, KeyRound, Link2, LogOut, X, HelpCircle } from 'lucide-react-native';
 
 export const AccountScreen = ({ navigation }: any) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -120,6 +119,21 @@ export const AccountScreen = ({ navigation }: any) => {
 
           {/* Opções de Ação */}
           <View style={styles.actionList}>
+            {/* Ver Tutorial de Uso */}
+            <TouchableOpacity
+              style={styles.actionItem}
+              onPress={() => navigation.navigate('Onboarding', { isReplay: true })}
+            >
+              <View style={[styles.actionIcon, { backgroundColor: 'rgba(16, 185, 129, 0.15)' }]}>
+                <HelpCircle size={20} color="#10b981" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.actionTitle}>Ver Tutorial de Uso</Text>
+                <Text style={styles.actionSub}>Aprenda passo a passo como funciona o aplicativo.</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Vincular Perfil Fantasma */}
             <TouchableOpacity style={styles.actionItem} onPress={() => setIsLinkOpen(true)}>
               <View style={styles.actionIcon}>
                 <Link2 size={20} color="#7c3aed" />
@@ -130,6 +144,7 @@ export const AccountScreen = ({ navigation }: any) => {
               </View>
             </TouchableOpacity>
 
+            {/* Encerrar Sessão */}
             <TouchableOpacity style={styles.logoutItem} onPress={handleLogout}>
               <View style={[styles.actionIcon, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
                 <LogOut size={20} color="#ef4444" />
