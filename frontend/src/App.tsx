@@ -14,6 +14,24 @@ import { Friends } from './pages/Friends';
 import { Activity } from './pages/Activity';
 import { Account } from './pages/Account';
 
+// Shell Responsivo Mobile-First (Dispositivo Móvel Centrado em Telas Grandes)
+const MobileShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <div className="min-h-screen bg-slate-900 md:bg-slate-950 flex items-center justify-center p-0 md:p-6 antialiased selection:bg-primary/30">
+      {/* Container simulando um smartphone em telas grandes e 100% full screen no celular */}
+      <div className="w-full max-w-md min-h-screen md:min-h-[844px] md:max-h-[920px] bg-background text-on-surface flex flex-col md:rounded-[40px] md:shadow-2xl md:border-8 md:border-slate-800 relative overflow-hidden">
+        {/* Notch / Speaker visual apenas no desktop */}
+        <div className="hidden md:flex justify-center pt-2 pb-1 bg-surface z-50">
+          <div className="w-24 h-4 bg-slate-800 rounded-full flex items-center justify-center">
+            <div className="w-3 h-1 bg-slate-700 rounded-full"></div>
+          </div>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+};
+
 // Guard de Rota Protegida
 const ProtectedLayout: React.FC = () => {
   if (!authService.isAuthenticated()) {
@@ -21,13 +39,23 @@ const ProtectedLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-on-surface flex flex-col antialiased">
+    <MobileShell>
       <Header />
-      <main className="flex-1 px-4 pt-6 max-w-4xl mx-auto w-full">
+      <main className="flex-1 px-4 pt-4 pb-24 overflow-y-auto custom-scrollbar">
         <Outlet />
       </main>
       <Navbar />
-    </div>
+    </MobileShell>
+  );
+};
+
+const PublicLayout: React.FC = () => {
+  return (
+    <MobileShell>
+      <div className="flex-1 overflow-y-auto">
+        <Outlet />
+      </div>
+    </MobileShell>
   );
 };
 
@@ -36,10 +64,12 @@ export const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         {/* Rotas Públicas */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route element={<PublicLayout />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Route>
 
-        {/* Rotas Protegidas com Layout (Header + Navbar) */}
+        {/* Rotas Protegidas com Layout Mobile */}
         <Route element={<ProtectedLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/groups" element={<Groups />} />

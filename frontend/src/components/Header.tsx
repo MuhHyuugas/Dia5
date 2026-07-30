@@ -15,38 +15,38 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="w-full sticky top-0 z-40 bg-surface/90 backdrop-blur-md border-b border-outline shadow-sm">
-      <div className="max-w-4xl mx-auto flex justify-between items-center px-4 h-16">
+    <header className="w-full shrink-0 z-40 bg-surface/90 backdrop-blur-md border-b border-outline shadow-sm">
+      <div className="w-full flex justify-between items-center px-4 h-14">
         {/* Logo & User Greeting */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg border border-primary/20">
-            {user?.nome ? user.nome.charAt(0).toUpperCase() : <UserIcon className="w-5 h-5" />}
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-base border border-primary/20">
+            {user?.nome ? user.nome.charAt(0).toUpperCase() : <UserIcon className="w-4 h-4" />}
           </div>
           <div>
-            <h1 className="text-lg font-bold text-on-surface leading-tight">Dia 5</h1>
-            <p className="text-xs text-on-surface-variant">Olá, <span className="font-semibold text-primary">{user?.nome || 'Usuário'}</span></p>
+            <h1 className="text-base font-bold text-on-surface leading-tight">Dia 5</h1>
+            <p className="text-[11px] text-on-surface-variant">Olá, <span className="font-semibold text-primary">{user?.nome || 'Usuário'}</span></p>
           </div>
         </div>
 
         {/* Profile Code Badge & Logout */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {user?.codigoPerfil && (
             <button
               onClick={handleCopyCode}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-full text-xs font-semibold border border-primary/20 transition-all btn-active"
+              className="flex items-center gap-1 px-2.5 py-1 bg-primary/10 hover:bg-primary/20 text-primary rounded-full text-[11px] font-semibold border border-primary/20 transition-all btn-active"
               title="Clique para copiar seu Código de Perfil"
             >
               <span>Código: <strong>{user.codigoPerfil}</strong></span>
-              {copied ? <Check className="w-3.5 h-3.5 text-secondary" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3 h-3 text-secondary" /> : <Copy className="w-3 h-3" />}
             </button>
           )}
 
           <button
             onClick={() => authService.logout()}
-            className="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-full transition-colors"
+            className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-full transition-colors"
             title="Sair da conta"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-4 h-4" />
           </button>
         </div>
       </div>
