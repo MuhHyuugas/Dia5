@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber, IsPositive, IsArray, ValidateNested, ArrayMinSize, IsDateString } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsPositive, IsArray, ValidateNested, ArrayMinSize, IsDateString, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class ParticipantDto {
@@ -31,6 +31,10 @@ export class CreateExpenseDto {
   @IsDateString({}, { message: 'A data da compra deve ser uma data válida.' })
   @IsNotEmpty({ message: 'A data da compra é obrigatória.' })
   dataCompra: string;
+
+  @IsOptional()
+  @IsString({ message: 'A categoria deve ser um texto.' })
+  categoria?: string;
 
   @IsArray({ message: 'A lista de participantes deve ser um array.' })
   @ArrayMinSize(1, { message: 'A despesa deve ter pelo menos 1 participante.' })

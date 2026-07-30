@@ -1,7 +1,11 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateGroupDto {
   @IsString({ message: 'O nome do grupo deve ser um texto.' })
   @IsNotEmpty({ message: 'O nome do grupo é obrigatório.' })
   nome: string;
+
+  @IsOptional()
+  @IsString({ message: 'A descrição do grupo deve ser um texto.' })
+  descricao?: string;
 }

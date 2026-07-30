@@ -6,7 +6,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    
+
+    console.error('[NestJS Unhandled Exception]:', exception);
+
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Erro interno do servidor';
 
@@ -15,7 +17,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
       const resContent: any = exception.getResponse();
       message = typeof resContent === 'object' && resContent.message ? resContent.message : exception.message;
     } else if (exception instanceof Error) {
-      // Mapeia erros genéricos de validação de domínio para 400 Bad Request
       status = HttpStatus.BAD_REQUEST;
       message = exception.message;
     }
