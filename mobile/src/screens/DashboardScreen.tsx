@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,29 +7,60 @@ import {
   FlatList,
   ActivityIndicator,
   RefreshControl,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { groupsService, Group } from '../services/groups.service';
 import { authService, AuthResponse } from '../services/auth.service';
-import { Plus, Users, Wallet, ChevronRight, TrendingUp, LogOut } from 'lucide-react-native';
+import { expensesService } from '../services/expenses.service';
+import { usersService } from '../services/users.service';
+import { useFocusEffect } from '@react-navigation/native';
+import { Plus, Users, Wallet, ChevronRight, TrendingUp, BookOpen } from 'lucide-react-native';
+import { useTheme } from '../theme/ThemeContext';
 
 export const DashboardScreen = ({ navigation }: any) => {
+  const { colors } = useTheme();
   const [user, setUser] = useState<AuthResponse | null>(null);
   const [groups, setGroups] = useState<Group[]>([]);
+  const [consolidatedBalance, setConsolidatedBalance] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, []),
+  );
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const currentUser = await authService.getCurrentUser();
+      const [currentUser, profile, data] = await Promise.all([
+        authService.getCurrentUser(),
+        usersService.getProfile().catch(() => null),
+        groupsService.getGroups(),
+      ]);
       setUser(currentUser);
-      const data = await groupsService.getGroups();
       setGroups(data);
+
+      const myUserId = profile?.id || currentUser?.userId || currentUser?.id;
+
+      if (myUserId && data.length > 0) {
+        const balances = await Promise.all(
+          data.map((g) => expensesService.getGroupBalance(g.id).catch(() => null))
+        );
+        let sum = 0;
+        for (const b of balances) {
+          if (b && b.balancoIndividual) {
+            const myB = b.balancoIndividual.find((m: any) => m.usuarioId === myUserId);
+            if (myB) {
+              sum += Number(myB.saldoLiquido) || 0;
+            }
+          }
+        }
+        setConsolidatedBalance(Math.round(sum * 100) / 100);
+      } else {
+        setConsolidatedBalance(0);
+      }
     } catch (err) {
       console.error('Erro ao carregar dashboard nativo:', err);
     } finally {
@@ -43,60 +74,72 @@ export const DashboardScreen = ({ navigation }: any) => {
     loadData();
   };
 
-  const handleLogout = async () => {
-    await authService.logout();
-    navigation.replace('Login');
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
       <View style={styles.content}>
         {/* Header Superior */}
-        <View style={styles.header}>
+        <View style={[styles.header, { borderBottomColor: colors.surface }]}>
           <View style={styles.userSection}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
+            <View style={[styles.avatar, { backgroundColor: colors.primaryBg, borderColor: colors.primary }]}>
+              <Text style={[styles.avatarText, { color: colors.primary }]}>
                 {user?.nome ? user.nome.charAt(0).toUpperCase() : 'U'}
               </Text>
             </View>
             <View>
-              <Text style={styles.headerTitle}>Dia 5</Text>
-              <Text style={styles.headerSubtitle}>
-                Olá, <Text style={styles.username}>{user?.nome || 'Usuário'}</Text>
+              <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Dia 5</Text>
+              <Text style={[styles.headerSubtitle, { color: colors.textMuted }]}>
+                Olá, <Text style={[styles.username, { color: colors.primary }]}>{user?.nome || 'Usuário'}</Text>
               </Text>
             </View>
           </View>
-
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <LogOut size={20} color="#94a3b8" />
-          </TouchableOpacity>
         </View>
 
         <FlatList
           data={groups}
           keyExtractor={(item) => item.id}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7c3aed" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
           }
           ListHeaderComponent={
             <View style={styles.bannerContainer}>
               {/* Card de Balanço Geral */}
-              <View style={styles.balanceCard}>
+              <View style={[styles.balanceCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                 <View style={styles.balanceHeader}>
                   <View>
-                    <Text style={styles.balanceLabel}>BALANÇO GERAL CONSOLIDADO</Text>
-                    <Text style={styles.balanceValue}>+ R$ 0,00</Text>
-                    <Text style={styles.balanceSubtext}>Saldos sincronizados em tempo real.</Text>
+                    <Text style={[styles.balanceLabel, { color: colors.textMuted }]}>BALANÇO GERAL CONSOLIDADO</Text>
+                    <Text
+                      style={[
+                        styles.balanceValue,
+                        consolidatedBalance > 0
+                          ? { color: colors.secondary }
+                          : consolidatedBalance < 0
+                          ? { color: colors.danger }
+                          : { color: colors.textMuted },
+                      ]}
+                    >
+                      {consolidatedBalance > 0
+                        ? `+ R$ ${consolidatedBalance.toFixed(2)}`
+                        : consolidatedBalance < 0
+                        ? `- R$ ${Math.abs(consolidatedBalance).toFixed(2)}`
+                        : 'R$ 0,00'}
+                    </Text>
+                    <Text style={[styles.balanceSubtext, { color: colors.textMuted }]}>
+                      {consolidatedBalance > 0
+                        ? 'Você tem saldo a receber somando todos os seus grupos.'
+                        : consolidatedBalance < 0
+                        ? 'Você tem dívidas pendentes somando todos os seus grupos.'
+                        : 'Você está quitado em todos os seus grupos!'}
+                    </Text>
                   </View>
-                  <View style={styles.walletIcon}>
-                    <Wallet size={24} color="#10b981" />
+                  <View style={[styles.walletIcon, { backgroundColor: colors.secondaryBg }]}>
+                    <Wallet size={24} color={colors.secondary} />
                   </View>
                 </View>
 
                 {/* Botões de Ação Rápida */}
                 <View style={styles.actionButtons}>
                   <TouchableOpacity
-                    style={styles.primaryActionButton}
+                    style={[styles.primaryActionButton, { backgroundColor: colors.primary }]}
                     onPress={() => navigation.navigate('AddExpense')}
                   >
                     <Plus size={20} color="#ffffff" />
@@ -104,57 +147,74 @@ export const DashboardScreen = ({ navigation }: any) => {
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={styles.secondaryActionButton}
+                    style={[styles.secondaryActionButton, { backgroundColor: colors.background, borderColor: colors.border }]}
                     onPress={() => navigation.navigate('GroupsTab')}
                   >
-                    <Users size={20} color="#7c3aed" />
-                    <Text style={styles.secondaryActionText}>Meus Grupos</Text>
+                    <Users size={20} color={colors.primary} />
+                    <Text style={[styles.secondaryActionText, { color: colors.textPrimary }]}>Meus Grupos</Text>
                   </TouchableOpacity>
                 </View>
               </View>
 
-              {/* Dica da Semana */}
-              <View style={styles.tipCard}>
-                <TrendingUp size={20} color="#7c3aed" />
+              {/* Card Tutorial */}
+              <TouchableOpacity
+                style={[styles.tutorialCard, { backgroundColor: colors.primaryBg, borderColor: colors.primary + '40' }]}
+                onPress={() => navigation.navigate('Onboarding', { isReplay: true })}
+              >
+                <BookOpen size={20} color={colors.primary} />
                 <View style={styles.tipContent}>
-                  <Text style={styles.tipTitle}>DICA INTELIGENTE DIA 5</Text>
-                  <Text style={styles.tipText}>
+                  <Text style={[styles.tipTitle, { color: colors.primary }]}>APRENDA A USAR O DIA 5</Text>
+                  <Text style={[styles.tipText, { color: colors.textMuted }]}>
+                    Veja o tutorial passo a passo e domine todas as funcionalidades!
+                  </Text>
+                </View>
+                <ChevronRight size={16} color={colors.primary} />
+              </TouchableOpacity>
+
+              {/* Dica da Semana */}
+              <View style={[styles.tipCard, { backgroundColor: colors.primaryBg, borderColor: colors.primary + '30' }]}>
+                <TrendingUp size={20} color={colors.primary} />
+                <View style={styles.tipContent}>
+                  <Text style={[styles.tipTitle, { color: colors.primary }]}>DICA INTELIGENTE DIA 5</Text>
+                  <Text style={[styles.tipText, { color: colors.textMuted }]}>
                     Adicione Usuários Convidados (Shadow Users) para registrar contas de pessoas que não possuem o app!
                   </Text>
                 </View>
               </View>
 
-              <Text style={styles.sectionTitle}>Meus Grupos ({groups.length})</Text>
+              <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Meus Grupos ({groups.length})</Text>
             </View>
           }
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={styles.groupCard}
+              style={[styles.groupCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
               onPress={() => navigation.navigate('GroupDetails', { groupId: item.id })}
             >
-              <View style={styles.groupBadge}>
-                <Text style={styles.groupBadgeText}>{item.nome.charAt(0).toUpperCase()}</Text>
+              <View style={[styles.groupBadge, { backgroundColor: colors.primaryBg }]}>
+                <Text style={[styles.groupBadgeText, { color: colors.primary }]}>{item.nome.charAt(0).toUpperCase()}</Text>
               </View>
 
               <View style={styles.groupInfo}>
-                <Text style={styles.groupName}>{item.nome}</Text>
-                <Text style={styles.groupCode}>Código: <Text style={styles.codeText}>{item.codigoConvite}</Text></Text>
+                <Text style={[styles.groupName, { color: colors.textPrimary }]}>{item.nome}</Text>
+                <Text style={[styles.groupCode, { color: colors.textMuted }]}>
+                  Código: <Text style={[styles.codeText, { color: colors.primary }]}>{item.codigoConvite}</Text>
+                </Text>
               </View>
 
-              <ChevronRight size={20} color="#64748b" />
+              <ChevronRight size={20} color={colors.textMuted} />
             </TouchableOpacity>
           )}
           ListEmptyComponent={
             loading ? (
-              <ActivityIndicator color="#7c3aed" style={{ marginTop: 24 }} />
+              <ActivityIndicator color={colors.primary} style={{ marginTop: 24 }} />
             ) : (
               <View style={styles.emptyContainer}>
-                <Users size={48} color="#64748b" />
-                <Text style={styles.emptyText}>Você ainda não participa de nenhum grupo.</Text>
+                <Users size={48} color={colors.textMuted} />
+                <Text style={[styles.emptyText, { color: colors.textMuted }]}>Você ainda não participa de nenhum grupo.</Text>
               </View>
             )
           }
-          contentContainerStyle={{ paddingBottom: 24 }}
+          contentContainerStyle={{ paddingBottom: 40 }}
         />
       </View>
     </SafeAreaView>
@@ -164,7 +224,6 @@ export const DashboardScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0b1326',
   },
   content: {
     flex: 1,
@@ -176,7 +235,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#171f33',
     marginBottom: 16,
   },
   userSection: {
@@ -188,43 +246,32 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(124, 58, 237, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#7c3aed',
   },
   avatarText: {
-    color: '#7c3aed',
     fontWeight: 'bold',
     fontSize: 16,
   },
   headerTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#dae2fd',
   },
   headerSubtitle: {
     fontSize: 12,
-    color: '#94a3b8',
   },
   username: {
-    color: '#7c3aed',
     fontWeight: 'bold',
-  },
-  logoutButton: {
-    padding: 8,
   },
   bannerContainer: {
     gap: 16,
     marginBottom: 16,
   },
   balanceCard: {
-    backgroundColor: '#171f33',
     borderRadius: 24,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#2d3449',
   },
   balanceHeader: {
     flexDirection: 'row',
@@ -234,23 +281,19 @@ const styles = StyleSheet.create({
   balanceLabel: {
     fontSize: 11,
     fontWeight: 'bold',
-    color: '#94a3b8',
     letterSpacing: 1,
   },
   balanceValue: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#10b981',
     marginTop: 4,
   },
   balanceSubtext: {
     fontSize: 12,
-    color: '#94a3b8',
     marginTop: 2,
   },
   walletIcon: {
     padding: 10,
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
     borderRadius: 16,
   },
   actionButtons: {
@@ -261,7 +304,6 @@ const styles = StyleSheet.create({
   primaryActionButton: {
     flex: 1,
     height: 48,
-    backgroundColor: '#7c3aed',
     borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -276,9 +318,7 @@ const styles = StyleSheet.create({
   secondaryActionButton: {
     height: 48,
     paddingHorizontal: 16,
-    backgroundColor: '#0b1326',
     borderWidth: 1,
-    borderColor: '#2d3449',
     borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -286,15 +326,20 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   secondaryActionText: {
-    color: '#dae2fd',
     fontWeight: 'bold',
     fontSize: 14,
   },
+  tutorialCard: {
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: 16,
+    gap: 12,
+    alignItems: 'center',
+  },
   tipCard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(124, 58, 237, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(124, 58, 237, 0.2)',
     borderRadius: 20,
     padding: 16,
     gap: 12,
@@ -306,42 +351,35 @@ const styles = StyleSheet.create({
   tipTitle: {
     fontSize: 11,
     fontWeight: 'bold',
-    color: '#7c3aed',
     letterSpacing: 1,
   },
   tipText: {
     fontSize: 12,
-    color: '#94a3b8',
     marginTop: 4,
     lineHeight: 18,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#dae2fd',
     marginTop: 8,
   },
   groupCard: {
-    backgroundColor: '#171f33',
     borderRadius: 20,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#2d3449',
   },
   groupBadge: {
     width: 44,
     height: 44,
     borderRadius: 16,
-    backgroundColor: 'rgba(124, 58, 237, 0.15)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
   groupBadgeText: {
-    color: '#7c3aed',
     fontWeight: 'bold',
     fontSize: 18,
   },
@@ -351,15 +389,12 @@ const styles = StyleSheet.create({
   groupName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#dae2fd',
   },
   groupCode: {
     fontSize: 12,
-    color: '#94a3b8',
     marginTop: 2,
   },
   codeText: {
-    color: '#7c3aed',
     fontWeight: 'bold',
   },
   emptyContainer: {
@@ -369,7 +404,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   emptyText: {
-    color: '#94a3b8',
     fontSize: 14,
     textAlign: 'center',
   },

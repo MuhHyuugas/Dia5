@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet,
   Text,
   View,
   TextInput,
@@ -9,11 +8,15 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { authService } from '../services/auth.service';
 import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react-native';
+import { useTheme } from '../theme/ThemeContext';
 
 export const LoginScreen = ({ navigation }: any) => {
+  const { colors } = useTheme();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [error, setError] = useState('');
@@ -38,38 +41,39 @@ export const LoginScreen = ({ navigation }: any) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24 }}>
         {/* Logo & Header */}
-        <View style={styles.header}>
-          <View style={styles.logoBadge}>
+        <View style={{ alignItems: 'center', marginBottom: 32 }}>
+          <View style={[styles.logoBadge, { backgroundColor: colors.primary, shadowColor: colors.primary }]}>
             <Text style={styles.logoText}>D5</Text>
           </View>
-          <Text style={styles.title}>Dia 5</Text>
-          <Text style={styles.subtitle}>Bem-vindo de volta. Entre na sua conta.</Text>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Dia 5</Text>
+          <Text style={[styles.subtitle, { color: colors.textMuted }]}>Bem-vindo de volta. Entre na sua conta.</Text>
         </View>
 
         {/* Mensagem de Erro */}
         {!!error && (
-          <View style={styles.errorContainer}>
-            <AlertCircle size={18} color="#ef4444" />
-            <Text style={styles.errorText}>{error}</Text>
+          <View style={[styles.errorContainer, { backgroundColor: colors.dangerBg, borderColor: colors.danger + '50' }]}>
+            <AlertCircle size={18} color={colors.danger} />
+            <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>
           </View>
         )}
 
         {/* Formulário */}
-        <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>E-MAIL</Text>
-            <View style={styles.inputWrapper}>
-              <Mail size={20} color="#64748b" style={styles.inputIcon} />
+        <View style={{ gap: 16 }}>
+          <View style={{ gap: 6 }}>
+            <Text style={[styles.label, { color: colors.textMuted }]}>E-MAIL</Text>
+            <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Mail size={20} color={colors.textMuted} style={styles.inputIcon} />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.textPrimary }]}
                 placeholder="seu@email.com"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.textMuted}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={email}
@@ -78,14 +82,14 @@ export const LoginScreen = ({ navigation }: any) => {
             </View>
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>SENHA</Text>
-            <View style={styles.inputWrapper}>
-              <Lock size={20} color="#64748b" style={styles.inputIcon} />
+          <View style={{ gap: 6 }}>
+            <Text style={[styles.label, { color: colors.textMuted }]}>SENHA</Text>
+            <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Lock size={20} color={colors.textMuted} style={styles.inputIcon} />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.textPrimary }]}
                 placeholder="••••••••"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.textMuted}
                 secureTextEntry
                 value={senha}
                 onChangeText={setSenha}
@@ -94,16 +98,16 @@ export const LoginScreen = ({ navigation }: any) => {
           </View>
 
           <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
+            style={[styles.button, { backgroundColor: colors.primary }, loading && styles.buttonDisabled]}
             onPress={handleLogin}
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#ffffff" />
+              <ActivityIndicator color={colors.textInverse} />
             ) : (
               <>
-                <Text style={styles.buttonText}>Entrar</Text>
-                <LogIn size={18} color="#ffffff" />
+                <Text style={[styles.buttonText, { color: colors.textInverse }]}>Entrar</Text>
+                <LogIn size={18} color={colors.textInverse} />
               </>
             )}
           </TouchableOpacity>
@@ -112,40 +116,26 @@ export const LoginScreen = ({ navigation }: any) => {
             style={styles.linkButton}
             onPress={() => navigation.navigate('Register')}
           >
-            <Text style={styles.linkText}>
-              Não tem uma conta? <Text style={styles.linkHighlight}>Criar uma conta</Text>
+            <Text style={[styles.linkText, { color: colors.textMuted }]}>
+              Não tem uma conta? <Text style={[styles.linkHighlight, { color: colors.primary }]}>Criar uma conta</Text>
             </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0b1326',
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 24,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
   logoBadge: {
     width: 64,
     height: 64,
     borderRadius: 20,
-    backgroundColor: '#7c3aed',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
     elevation: 4,
-    shadowColor: '#7c3aed',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -158,47 +148,33 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#dae2fd',
   },
   subtitle: {
     fontSize: 14,
-    color: '#94a3b8',
     marginTop: 4,
   },
   errorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.3)',
     padding: 12,
     borderRadius: 12,
     marginBottom: 16,
     gap: 8,
   },
   errorText: {
-    color: '#ef4444',
     fontSize: 13,
     flex: 1,
-  },
-  form: {
-    gap: 16,
-  },
-  inputGroup: {
-    gap: 6,
   },
   label: {
     fontSize: 11,
     fontWeight: 'bold',
-    color: '#94a3b8',
     letterSpacing: 1,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#171f33',
     borderWidth: 1,
-    borderColor: '#2d3449',
     borderRadius: 14,
     paddingHorizontal: 12,
     height: 52,
@@ -208,11 +184,9 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: '#dae2fd',
     fontSize: 15,
   },
   button: {
-    backgroundColor: '#7c3aed',
     height: 54,
     borderRadius: 16,
     flexDirection: 'row',
@@ -226,7 +200,6 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: '#ffffff',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -236,11 +209,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   linkText: {
-    color: '#94a3b8',
     fontSize: 14,
   },
   linkHighlight: {
-    color: '#7c3aed',
     fontWeight: 'bold',
   },
 });

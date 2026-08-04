@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
+<title>SplitWise Premium - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f3f4f6; /* Light gray background */
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Inter', sans-serif;
+            color: #111827; /* Dark text for readability */
+        }
+        .ios-scroll-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                primary: '#2563eb', /* A standard, recognizable blue */
+                'primary-dark': '#1d4ed8',
+                secondary: '#10b981', /* Green for positive */
+                error: '#ef4444', /* Red for negative */
+                surface: '#ffffff',
+                background: '#f3f4f6',
+                'on-surface': '#111827',
+                'on-surface-variant': '#4b5563',
+                outline: '#e5e7eb',
+              }
+            }
+          }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-50 bg-surface border-b border-outline shadow-sm">
+<div class="flex justify-between items-center w-full px-4 h-14">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional studio headshot of a stylish young person for a user profile avatar. The background is a clean, dark slate grey with soft, professional rim lighting highlighting the person's features. High-end photography style with sharp focus and cinematic depth of field, fitting a premium dark-themed financial app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxo6_mQi48-jenb_ZbnxYVpTTy6oqUzgiR-nlA-RmICSL8wLy1NeFX5WDyoU1x30Oj4eKRsOvTwtljD9ZmvtTulleGMxiuWDtJ2m1wQ9mOys-OIB9e0qHE1P9yqMLhtVKKW--lczRbGfzPcTP_g2fNtwVK6bng_yicON3Cdn60gRYyiwDoXnYLzFIH0FYQWJbqSYAsbTkS1DI5QwNTNL3dm23t-euLea97K7vetrW6vtZqTWH3VT0oPTAbzThnFZLZfa7l-OqQAogg">
+</div>
+<img src="https://lh3.googleusercontent.com/aida/AP1WRLvN9tVxIXdvfY_djKHbJJs4JIaC7J2TyhfY7vpTPxbpkCgsxRiHmBGBqocTgNI4JmhbzKpr7Rdt9unuHu8evrlWWvYAJQAuC-EwlLi7g5uN79EcOUT0-ziTqmAc_YFuS6Xt3SLo2TSCoCdOI-4rYXStZtjw2xjOygUJeUmBEP-XgFsjr6isKS-yFF-Youkb93lvrlN8am1_F-QNrWgBBtRtJKWYir07ZTRThKzuFxk_XFuKLszjXrRnbUA" alt="Dia 5 Logo" class="h-8 w-auto object-contain">
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="flex-1 px-4 pt-6 pb-28 max-w-4xl mx-auto w-full">
+<!-- Global Balance Section -->
+<section class="mb-8">
+<div class="bg-surface p-5 rounded-2xl border border-outline shadow-sm">
+<div>
+<p class="text-sm font-medium text-on-surface-variant uppercase tracking-wider mb-1">Saldo Global</p>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl text-secondary font-bold">+ R$ 120,00</span>
+</div>
+<p class="text-sm text-on-surface-variant mt-1">Você está no positivo este mês.</p>
+<div class="mt-5 flex gap-3">
+<button class="flex-1 h-12 bg-primary text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-primary-dark transition-colors active:bg-blue-800">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+                            Adicionar Gasto
+                        </button>
+<button class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-on-surface hover:bg-gray-200 transition-colors">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Groups Section -->
+<section>
+<div class="flex justify-between items-center mb-4 px-1">
+<h2 class="text-xl font-bold text-on-surface">Meus Grupos</h2>
+<button class="text-primary font-medium text-sm hover:underline">Ver todos</button>
+</div>
+<div class="bg-surface rounded-2xl border border-outline shadow-sm overflow-hidden divide-y divide-outline">
+<!-- Group Item: República -->
+<div class="p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors cursor-pointer active:bg-gray-100">
+<div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-gray-200">
+<img class="w-full h-full object-cover" data-alt="A minimalist architectural shot of a modern apartment building with clean lines and large windows during dusk. The lighting is warm and inviting against a cool blue twilight sky, reflecting a sophisticated communal living atmosphere. Digital photography style, high resolution, soft textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrdWbu-AaOaFaWVGn0vG7dOQBQLe9o12GxEIjOQvh44O-3vjARxzK9Y0vQt3_VA6qtkZ9O40DM2k1Ho6VVdfwMFMMv7xaNW541RrCWPRhN1q6TU4phyVLWWkdZWGO5AlPcuMGTW12Np0fKpTXcHJFwFu13E40Y-n2k9oclXtugYIoBx2g4tSAadPOKojlP815ngRNRqQkYR20gdwR9igA43-ifMJ5Wr0yGDEp-WAS38SfpzkTlXhm1G0Kou2XPAkB_o0icTFV-OKy1">
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-base font-semibold text-on-surface truncate">República</h3>
+<p class="text-sm font-medium text-secondary">Você recebe R$ 45,00</p>
+</div>
+<div class="flex flex-col items-end">
+<span class="material-symbols-outlined text-gray-400" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+<!-- Group Item: Viagem Praia -->
+<div class="p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors cursor-pointer active:bg-gray-100">
+<div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-gray-200">
+<img class="w-full h-full object-cover" data-alt="A serene, wide-angle shot of a pristine tropical beach with turquoise water and fine white sand. A single palm tree leans into the frame from the side. The lighting is bright and summery, with high contrast and vibrant blues. Cinematic travel photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtbJTvvcYY24q-IsHZ0ODVeAA8v_xo3JtpOskC45v3PbLjn4ObFgLqLPi6KJSjicvXI8IOUp-RrvZ0A5V2tD0vTuBB9sD-g7kF-OuHUtMHhMOBLU-b3ptQIhQo9vkm6QWc2UOHehxE_B5FUbW2X68XfwcDCVUtZaHLEPj5Ovwa4U0cYrF4FWb7d1WlvGt7G6xdkXjdTiwtvrKZQLvf1-KQRaLA7Dl-wUThCO69NpcNi4pq4IMc-I_DubtedHAmB4NJSRtz1DDthrc9">
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-base font-semibold text-on-surface truncate">Viagem Praia</h3>
+<p class="text-sm font-medium text-secondary">Você recebe R$ 90,00</p>
+</div>
+<div class="flex flex-col items-end">
+<span class="material-symbols-outlined text-gray-400" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+<!-- Group Item: Festa -->
+<div class="p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors cursor-pointer active:bg-gray-100">
+<div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-gray-200">
+<img class="w-full h-full object-cover" data-alt="An abstract, high-contrast shot of neon party lights and bokeh effects in deep purples and electric greens. The atmosphere is vibrant and energetic, capturing the essence of a modern urban celebration. Sleek, high-fidelity digital art style with deep blacks." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCELZ-D9r-U6fiQ6pZmBMelaK9_-h9MqBtG7-jSUiWTqGN5vwkiWukOayKCyfETNMviKk6aKyPvGFbrnGmnLJZ01Zb_Xwh-c-thNFHvJCI63IFMEh94PdEZ1jYGdr8vmrq7V1pHhmncngrb_pheivADGx15Pt1P6x6cdPTY_-TlcBdgz4euySIfTCGukvRsVm9u80PpkJMpVlaSuvoY-Q0CAub8VvIakqwMhjrF8sqTkhl3sZEeVx6HCqFXzw6_Cz21ZVyEy11jzNB">
+</div>
+<div class="flex-1 min-w-0">
+<h3 class="text-base font-semibold text-on-surface truncate">Festa</h3>
+<p class="text-sm font-medium text-error">Você deve R$ 15,00</p>
+</div>
+<div class="flex flex-col items-end">
+<span class="material-symbols-outlined text-gray-400" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Quick Insights Card -->
+<div class="mt-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="insights">insights</span>
+<h3 class="text-sm font-semibold text-primary-dark">Dica da Semana</h3>
+</div>
+<p class="text-sm text-blue-900 leading-relaxed">
+                    Você gastou 15% menos com "Mercado" em relação à semana passada. Continue assim!
+                </p>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface border-t border-outline pb-safe pt-2 pb-2">
+<div class="flex justify-around items-center px-2">
+<!-- Dashboard (Active) -->
+<button class="flex flex-col items-center justify-center p-2 text-primary">
+<span class="material-symbols-outlined" data-icon="grid_view" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="text-[10px] font-medium mt-1">Início</span>
+</button>
+<!-- Groups -->
+<button class="flex flex-col items-center justify-center p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="text-[10px] font-medium mt-1">Grupos</span>
+</button>
+<!-- Activity -->
+<button class="flex flex-col items-center justify-center p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="text-[10px] font-medium mt-1">Atividade</span>
+</button>
+<!-- Account -->
+<button class="flex flex-col items-center justify-center p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-[10px] font-medium mt-1">Conta</span>
+</button>
+</div>
+</nav>
+<!-- Floating Action Button for Adding Group/Expense -->
+<button class="fixed right-4 bottom-20 w-14 h-14 bg-primary text-white rounded-full shadow-lg flex items-center justify-center hover:bg-primary-dark active:scale-95 transition-all z-40">
+<span class="material-symbols-outlined text-[28px]" data-icon="group_add">group_add</span>
+</button>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Adjust body for bottom safe areas on iOS
+            const bottomNav = document.querySelector('nav');
+            if (bottomNav) {
+                const paddingBottom = window.getComputedStyle(bottomNav).paddingBottom;
+                if (paddingBottom === '0px') {
+                    // Fallback for non-ios or old browsers
+                    bottomNav.classList.add('pb-2');
+                }
+            }
+        });
+    </script>
+
+
+</body></html>

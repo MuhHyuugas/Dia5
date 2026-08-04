@@ -1,0 +1,251 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>SplitWise - Perfil</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#ffb3b0",
+                    "surface-dim": "#0b1326",
+                    "on-primary": "#3f008e",
+                    "outline-variant": "#4a4455",
+                    "on-tertiary": "#670211",
+                    "on-tertiary-fixed": "#410006",
+                    "surface-container-highest": "#2d3449",
+                    "primary-fixed-dim": "#d2bbff",
+                    "on-background": "#dae2fd",
+                    "secondary-fixed": "#6dfe9c",
+                    "tertiary": "#ffb3b0",
+                    "inverse-surface": "#dae2fd",
+                    "surface-container-low": "#131b2e",
+                    "on-primary-container": "#ede0ff",
+                    "on-secondary-fixed-variant": "#005227",
+                    "on-tertiary-container": "#ffdedc",
+                    "surface-container-high": "#222a3d",
+                    "on-primary-fixed": "#25005a",
+                    "on-error": "#690005",
+                    "surface-variant": "#2d3449",
+                    "on-tertiary-fixed-variant": "#881d24",
+                    "error-container": "#93000a",
+                    "background": "#0b1326",
+                    "tertiary-container": "#b33e41",
+                    "on-primary-fixed-variant": "#5a00c6",
+                    "on-secondary": "#003919",
+                    "secondary": "#4de082",
+                    "on-secondary-container": "#003e1c",
+                    "primary-fixed": "#eaddff",
+                    "tertiary-fixed": "#ffdad8",
+                    "inverse-primary": "#732ee4",
+                    "surface-container": "#171f33",
+                    "on-surface-variant": "#ccc3d8",
+                    "outline": "#958da1",
+                    "secondary-fixed-dim": "#4de082",
+                    "on-surface": "#dae2fd",
+                    "secondary-container": "#00b55d",
+                    "on-secondary-fixed": "#00210c",
+                    "on-error-container": "#ffdad6",
+                    "error": "#ffb4ab",
+                    "primary-container": "#7c3aed",
+                    "surface-bright": "#31394d",
+                    "primary": "#d2bbff",
+                    "surface-tint": "#d2bbff",
+                    "inverse-on-surface": "#283044",
+                    "surface-container-lowest": "#060e20",
+                    "surface": "#0b1326"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-lg": "24px",
+                    "section-gap": "48px",
+                    "base": "8px",
+                    "stack-sm": "4px",
+                    "gutter": "16px",
+                    "stack-md": "12px",
+                    "container-margin-desktop": "40px",
+                    "container-margin-mobile": "20px"
+            },
+            "fontFamily": {
+                    "numeric-xl": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "numeric-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .ios-list-item:not(:last-child) {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .active-tap:active {
+            background-color: #f3f4f6;
+            transition: background-color 0.1s ease;
+        }
+
+        .settings-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            border: 1px solid #f3f4f6;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-24 bg-gray-50 text-gray-900">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-center items-center px-container-margin-mobile h-14 w-full bg-white border-b border-gray-200">
+<img src="https://lh3.googleusercontent.com/aida/AP1WRLvN9tVxIXdvfY_djKHbJJs4JIaC7J2TyhfY7vpTPxbpkCgsxRiHmBGBqocTgNI4JmhbzKpr7Rdt9unuHu8evrlWWvYAJQAuC-EwlLi7g5uN79EcOUT0-ziTqmAc_YFuS6Xt3SLo2TSCoCdOI-4rYXStZtjw2xjOygUJeUmBEP-XgFsjr6isKS-yFF-Youkb93lvrlN8am1_F-QNrWgBBtRtJKWYir07ZTRThKzuFxk_XFuKLszjXrRnbUA" alt="Dia 5 Logo" class="h-8 w-auto object-contain">
+</header>
+<main class="pt-20 px-4 max-w-lg mx-auto">
+<!-- Profile Section -->
+<section class="settings-card mb-6 p-4 flex items-center gap-4 active-tap cursor-pointer">
+<div class="relative">
+<div class="w-16 h-16 rounded-full overflow-hidden bg-gray-200">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a confident young man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQtFHpRYLrUln3iyah91d2bVAb2ED5Xyh94nDe7hBEaQkHh3WpHfPGk8jUXQdpAWL7tDkpusBgrfCGptlqWcL7m5_efIxzfyaxPkLtyJIcHaUe7D-nkWHotYwSTslCmqwJp0D5qv2RC1QLtHqh-Za40eu8hCW4DwOi62gT34c-SJ7mwkOIZs9rBo5eY5-s8wRpkwaAH4Puj0hAbNWFJhMeI-W2vskv38C_g3DrVUtNU4Yk1VHa1u4FcW4OZjTJKSYuQPbGcAfvbeWI">
+</div>
+</div>
+<div class="flex-1">
+<h1 class="font-body-lg text-body-lg text-gray-900 font-semibold">Murilo Oliveira</h1>
+<p class="text-sm text-gray-500">Premium Member</p>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</section>
+<!-- Profile Code Card -->
+<section class="settings-card mb-6 overflow-hidden">
+<div class="flex justify-between items-center p-4 border-b border-gray-100">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-gray-400">qr_code</span>
+<span class="font-body-md text-gray-900">Código de Perfil</span>
+</div>
+<span class="font-body-md font-semibold text-gray-900">MUR-9988</span>
+</div>
+<div class="p-4 bg-gray-50 flex flex-col gap-3">
+<p class="text-xs text-gray-500 leading-relaxed font-body-md">
+                    Use este código para vincular contas de convidados e unificar seus gastos em grupos compartilhados de forma segura.
+                </p>
+<button class="w-full py-2 bg-white border border-gray-200 rounded-lg font-body-md text-sm text-gray-700 flex items-center justify-center gap-2 hover:bg-gray-50 transition-all shadow-sm active-tap" id="copy-btn">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+                        Copiar Código
+                    </button>
+</div>
+</section>
+<!-- Standard Settings List -->
+<section class="settings-card mb-8">
+<!-- PIX -->
+<div class="ios-list-item flex items-center justify-between p-4 active-tap cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-md bg-emerald-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-emerald-600 text-[20px]">payments</span>
+</div>
+<span class="font-body-md text-gray-900">Minhas Chaves PIX</span>
+</div>
+<span class="material-symbols-outlined text-gray-300">chevron_right</span>
+</div>
+<!-- Notifications -->
+<div class="ios-list-item flex items-center justify-between p-4 active-tap cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-md bg-red-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-red-500 text-[20px]">notifications_active</span>
+</div>
+<span class="font-body-md text-gray-900">Notificações</span>
+</div>
+<span class="material-symbols-outlined text-gray-300">chevron_right</span>
+</div>
+<!-- Appearance -->
+<div class="ios-list-item flex items-center justify-between p-4 active-tap cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-md bg-blue-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-500 text-[20px]">palette</span>
+</div>
+<span class="font-body-md text-gray-900">Aparência</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-sm text-gray-400 font-body-md">Light</span>
+<span class="material-symbols-outlined text-gray-300">chevron_right</span>
+</div>
+</div>
+</section>
+<section class="settings-card mb-8">
+<!-- Logout -->
+<div class="ios-list-item flex items-center justify-between p-4 active-tap cursor-pointer text-red-500">
+<span class="font-body-md w-full text-center">Sair da Conta</span>
+</div>
+</section>
+<!-- Footer / Version -->
+<footer class="text-center pb-8">
+<p class="font-label-caps text-label-caps text-gray-400 mb-2">SPLITWISE v4.12.0</p>
+<p class="text-[10px] text-gray-400 px-8">Desenvolvido para máxima transparência financeira e simplicidade social.</p>
+</footer>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 bg-white border-t border-gray-200 h-16">
+<a class="flex flex-col items-center justify-center text-gray-400 hover:text-gray-900 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-medium mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-400 hover:text-gray-900 transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-medium mt-1">Groups</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-400 hover:text-gray-900 transition-colors" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="text-[10px] font-medium mt-1">Activity</span>
+</a>
+<a class="flex flex-col items-center justify-center text-blue-600 font-bold transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="text-[10px] font-medium mt-1">Account</span>
+</a>
+</nav>
+<script>
+        const copyBtn = document.getElementById('copy-btn');
+        copyBtn.addEventListener('click', () => {
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Copiado!';
+            
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+            
+            if (window.navigator.vibrate) {
+                window.navigator.vibrate(20);
+            }
+        });
+    </script>
+
+
+</body></html>

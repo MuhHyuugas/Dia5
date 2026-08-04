@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Payment } from '../../domain/entities/payment.entity';
 import { User } from '../../domain/entities/user.entity';
 import { Expense } from '../../domain/entities/expense.entity';
+import { GroupMember } from '../../domain/entities/group-member.entity';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { randomUUID } from 'crypto';
 
@@ -16,6 +17,8 @@ export class PaymentsService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Expense)
     private readonly expenseRepository: Repository<Expense>,
+    @InjectRepository(GroupMember)
+    private readonly groupMemberRepository: Repository<GroupMember>,
   ) {}
 
   async getGlobalBalance(userId: string, friendId: string): Promise<any> {
@@ -96,27 +99,42 @@ export class PaymentsService {
   }
 
   async settleDebt(userId: string, dto: CreatePaymentDto): Promise<{ message: string; payment: Payment }> {
+    const pagadorId = dto.pagadorId || userId;
+
+    if (pagadorId === dto.recebedorId) {
+      throw new BadRequestException('Não é possível registrar uma quitação de uma pessoa para ela mesma.');
+    }
+
     const recebedor = await this.userRepository.findOne({ where: { id: dto.recebedorId } });
     if (!recebedor) {
       throw new NotFoundException('Usuário recebedor não encontrado.');
     }
 
-    // Valida se o valor pago é maior que a dívida atual (FE02 UC02)
-    const globalBalance = await this.getGlobalBalance(userId, dto.recebedorId);
-    if (globalBalance.saldoLiquido < 0) {
-      const dividaAtual = Math.abs(globalBalance.saldoLiquido);
-      if (dto.valorPago > dividaAtual + 0.01) {
-        throw new BadRequestException(
-          `O valor do acerto (R$ ${dto.valorPago.toFixed(2)}) não pode ser maior que a dívida atual (R$ ${dividaAtual.toFixed(2)}).`,
-        );
+    const pagador = await this.userRepository.findOne({ where: { id: pagadorId } });
+    if (!pagador) {
+      throw new NotFoundException('Usuário pagador não encontrado.');
+    }
+
+    let targetGroupId = dto.grupoId || null;
+    if (!targetGroupId) {
+      // Se grupoId não foi passado, procura se ambos pertencem a um grupo em comum
+      const myMemberships = await this.groupMemberRepository.find({ where: { usuarioId: pagadorId } });
+      for (const m of myMemberships) {
+        const otherMember = await this.groupMemberRepository.findOne({
+          where: { grupoId: m.grupoId, usuarioId: dto.recebedorId },
+        });
+        if (otherMember) {
+          targetGroupId = m.grupoId;
+          break;
+        }
       }
     }
 
     const payment = new Payment();
     payment.id = randomUUID();
-    payment.pagadorId = userId;
+    payment.pagadorId = pagadorId;
     payment.recebedorId = dto.recebedorId;
-    payment.grupoId = dto.grupoId || null;
+    payment.grupoId = targetGroupId;
     payment.valorPago = Number(dto.valorPago);
     payment.dataPagamento = new Date();
 

@@ -1,0 +1,198 @@
+<!DOCTYPE html><html class="" lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Dia 5 - Cadastro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#00b55d",
+                        "surface-container-lowest": "#060e20",
+                        "surface-bright": "#31394d",
+                        "secondary": "#4de082",
+                        "primary-container": "#7c3aed",
+                        "on-surface": "#dae2fd",
+                        "surface-dim": "#0b1326",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#131b2e",
+                        "on-error-container": "#ffdad6",
+                        "surface": "#0b1326",
+                        "outline": "#958da1",
+                        "on-secondary-fixed-variant": "#005227",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "outline-variant": "#4a4455",
+                        "surface-tint": "#d2bbff",
+                        "primary": "#d2bbff",
+                        "tertiary-fixed": "#ffdad8",
+                        "primary-fixed-dim": "#d2bbff",
+                        "inverse-on-surface": "#283044",
+                        "inverse-surface": "#dae2fd",
+                        "on-tertiary-container": "#ffdedc",
+                        "on-background": "#dae2fd",
+                        "tertiary": "#ffb3b0",
+                        "on-primary": "#3f008e",
+                        "secondary-fixed-dim": "#4de082",
+                        "on-secondary": "#003919",
+                        "on-primary-container": "#ede0ff",
+                        "on-secondary-container": "#003e1c",
+                        "on-secondary-fixed": "#00210c",
+                        "on-tertiary-fixed-variant": "#881d24",
+                        "surface-container-high": "#222a3d",
+                        "surface-variant": "#2d3449",
+                        "tertiary-container": "#b33e41",
+                        "on-tertiary-fixed": "#410006",
+                        "on-surface-variant": "#ccc3d8",
+                        "secondary-fixed": "#6dfe9c",
+                        "surface-container": "#171f33",
+                        "on-tertiary": "#670211",
+                        "primary-fixed": "#eaddff",
+                        "on-primary-fixed": "#25005a",
+                        "inverse-primary": "#732ee4",
+                        "error": "#ffb4ab",
+                        "surface-container-highest": "#2d3449",
+                        "on-error": "#690005",
+                        "background": "#0b1326",
+                        "tertiary-fixed-dim": "#ffb3b0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-margin-desktop": "40px",
+                        "stack-sm": "4px",
+                        "stack-md": "12px",
+                        "section-gap": "48px",
+                        "gutter": "16px",
+                        "base": "8px",
+                        "stack-lg": "24px",
+                        "container-margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "numeric-xl": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "numeric-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #ffffff; /* Override dark mode background for this specific light mode screen */
+            color: #000000;
+        }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 16px;
+            color: #000;
+            border: none;
+            border-bottom: 2px solid #e5e7eb;
+            outline: none;
+            background: transparent;
+            transition: border-color 0.3s;
+        }
+
+        .input-group label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 10px 0;
+            font-size: 16px;
+            color: #6b7280;
+            pointer-events: none;
+            transition: 0.3s ease all;
+        }
+
+        .input-group input:focus,
+        .input-group input:valid {
+            border-bottom: 2px solid #7c3aed; /* Primary container color used as accent */
+        }
+
+        .input-group input:focus ~ label,
+        .input-group input:valid ~ label {
+            top: -20px;
+            font-size: 12px;
+            color: #7c3aed;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+<!-- Header (Transactional, minimal nav) -->
+<header class="flex items-center justify-between px-container-margin-mobile md:px-container-margin-desktop h-16 w-full bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm top-0 sticky z-50">
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-gray-100 rounded-full transition-colors active:scale-95 duration-150 ease-in-out">
+<span class="material-symbols-outlined text-gray-700" data-icon="arrow_back">arrow_back</span>
+</button>
+<div class="h-8 flex items-center"><img src="https://lh3.googleusercontent.com/aida/AP1WRLvN9tVxIXdvfY_djKHbJJs4JIaC7J2TyhfY7vpTPxbpkCgsxRiHmBGBqocTgNI4JmhbzKpr7Rdt9unuHu8evrlWWvYAJQAuC-EwlLi7g5uN79EcOUT0-ziTqmAc_YFuS6Xt3SLo2TSCoCdOI-4rYXStZtjw2xjOygUJeUmBEP-XgFsjr6isKS-yFF-Youkb93lvrlN8am1_F-QNrWgBBtRtJKWYir07ZTRThKzuFxk_XFuKLszjXrRnbUA" alt="Dia 5 Logo" class="h-full w-auto object-contain"></div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex items-center justify-center p-container-margin-mobile">
+<div class="w-full max-w-md bg-white rounded-2xl shadow-[0_10px_30px_rgba(124,58,237,0.04)] p-8">
+<div class="text-center mb-10">
+<h2 class="font-display-lg-mobile text-display-lg-mobile text-gray-900 mb-2">Crie sua conta</h2>
+<p class="font-body-md text-body-md text-gray-500">Comece a gerenciar suas despesas de forma inteligente.</p>
+</div>
+<form class="flex flex-col">
+<div class="input-group">
+<input id="fullName" required="" type="text">
+<label for="fullName" class="">Nome Completo</label>
+</div>
+<div class="input-group">
+<input id="email" required="" type="email">
+<label for="email" class="">E-mail</label>
+</div>
+<div class="input-group">
+<input id="password" required="" type="password">
+<label for="password" class="">Senha</label>
+</div>
+<div class="input-group">
+<input id="confirmPassword" required="" type="password">
+<label for="confirmPassword" class="">Confirmar Senha</label>
+</div>
+<button class="w-full bg-[#7c3aed] text-white font-label-caps text-label-caps py-4 rounded-xl mt-4 hover:bg-[#6b21a8] transition-colors active:scale-95 duration-200 shadow-md" type="button">
+                    Cadastrar
+                </button>
+</form>
+<div class="mt-8 text-center">
+<p class="font-body-md text-body-md text-gray-600">
+                    Já tenho uma conta? 
+                    <a class="text-[#7c3aed] font-semibold hover:underline decoration-2 underline-offset-4" href="#">Entrar</a>
+</p>
+</div>
+</div>
+</main>
+
+
+</body></html>

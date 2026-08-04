@@ -4,11 +4,13 @@ import { usersService } from '../services/users.service';
 import type { UserProfile } from '../services/users.service';
 import { Modal } from '../components/Modal';
 import { TutorialModal } from '../components/TutorialModal';
-import { Mail, Copy, Check, Link2, LogOut, KeyRound, HelpCircle } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
+import { Mail, Copy, Check, Link2, LogOut, KeyRound, HelpCircle, Sun, Moon } from 'lucide-react';
 
 export const Account: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const { isDark, toggleTheme } = useTheme();
 
   // Modais
   const [isLinkOpen, setIsLinkOpen] = useState(false);
@@ -123,6 +125,25 @@ export const Account: React.FC = () => {
           </section>
 
           <section className="bg-surface rounded-3xl border border-outline shadow-sm overflow-hidden divide-y divide-outline">
+            {/* Toggle de Tema */}
+            <div
+              onClick={toggleTheme}
+              className="p-5 flex items-center justify-between hover:bg-background/50 transition-colors cursor-pointer active:bg-background"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className={`p-3 rounded-2xl ${isDark ? 'bg-amber-500/10 text-amber-500' : 'bg-indigo-500/10 text-indigo-500'}`}>
+                  {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-on-surface">{isDark ? 'Ativar Modo Claro' : 'Ativar Modo Escuro'}</h3>
+                  <p className="text-xs text-on-surface-variant">Atualmente: {isDark ? 'Tema Escuro 🌙' : 'Tema Claro ☀️'}</p>
+                </div>
+              </div>
+              <div className={`w-10 h-6 rounded-full transition-colors relative ${isDark ? 'bg-primary' : 'bg-outline'}`}>
+                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${isDark ? 'left-5' : 'left-1'}`} />
+              </div>
+            </div>
+
             {/* Ver Tutorial de Uso */}
             <div
               onClick={() => setIsTutorialOpen(true)}

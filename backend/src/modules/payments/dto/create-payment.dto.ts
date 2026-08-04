@@ -1,6 +1,10 @@
 import { IsNotEmpty, IsString, IsNumber, IsPositive, IsOptional } from 'class-validator';
 
 export class CreatePaymentDto {
+  @IsOptional()
+  @IsString({ message: 'O ID do pagador deve ser um texto.' })
+  pagadorId?: string;
+
   @IsString({ message: 'O ID do recebedor deve ser um texto.' })
   @IsNotEmpty({ message: 'O ID do recebedor é obrigatório.' })
   recebedorId: string;

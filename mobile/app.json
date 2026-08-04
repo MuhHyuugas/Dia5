@@ -1,10 +1,16 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "Dia 5",
+    "slug": "dia5",
+    "scheme": "dia5",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#4f46e5"
+    },
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true

@@ -15,10 +15,15 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(GroupMember)
+    private readonly groupMemberRepository: Repository<GroupMember>,
     private readonly dataSource: DataSource,
   ) {}
 
+
   async createGuest(criadoPorId: string, dto: CreateGuestUserDto): Promise<Partial<User>> {
+    console.log('[createGuest] DTO recebido:', JSON.stringify(dto));
+
     const guest = new User();
     guest.id = randomUUID();
     guest.nome = dto.nome;
@@ -32,6 +37,19 @@ export class UsersService {
     guest.validar();
 
     await this.userRepository.save(guest);
+    console.log('[createGuest] Guest salvo com id:', guest.id);
+
+    // UC07: Se um grupo foi informado, adiciona o convidado como membro automaticamente
+    if (dto.grupoId) {
+      console.log('[createGuest] Adicionando ao grupo:', dto.grupoId);
+      const membership = new GroupMember();
+      membership.grupoId = dto.grupoId;
+      membership.usuarioId = guest.id;
+      await this.groupMemberRepository.save(membership);
+      console.log('[createGuest] Membro adicionado ao grupo com sucesso!');
+    } else {
+      console.warn('[createGuest] grupoId NÃO foi informado! Convidado criado sem grupo.');
+    }
 
     return {
       id: guest.id,
@@ -40,6 +58,8 @@ export class UsersService {
       criadoPorId: guest.criadoPorId,
     };
   }
+
+
 
   async getProfile(userId: string): Promise<Partial<User>> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
@@ -52,8 +72,34 @@ export class UsersService {
       nome: user.nome,
       email: user.email,
       codigoPerfil: user.codigoPerfil,
+      fotoUrl: user.fotoUrl,
       isGuest: user.isGuest,
       createdAt: user.createdAt,
+    };
+  }
+
+  async updateProfile(userId: string, dto: { nome?: string; fotoUrl?: string }): Promise<Partial<User>> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    if (dto.nome !== undefined && dto.nome.trim() !== '') {
+      user.nome = dto.nome.trim();
+    }
+    if (dto.fotoUrl !== undefined) {
+      user.fotoUrl = dto.fotoUrl;
+    }
+
+    await this.userRepository.save(user);
+
+    return {
+      id: user.id,
+      nome: user.nome,
+      email: user.email,
+      codigoPerfil: user.codigoPerfil,
+      fotoUrl: user.fotoUrl,
+      isGuest: user.isGuest,
     };
   }
 

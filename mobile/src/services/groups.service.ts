@@ -17,6 +17,7 @@ export interface ActivityItem {
   pagador?: string;
   recebedor?: string;
   data: string;
+  grupoNome?: string;
 }
 
 export const groupsService = {

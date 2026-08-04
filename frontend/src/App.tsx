@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom
 import { authService } from './services/auth.service';
 import { Header } from './components/Header';
 import { Navbar } from './components/Navbar';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
@@ -16,14 +17,15 @@ import { Account } from './pages/Account';
 
 // Shell Responsivo Mobile-First (Dispositivo Móvel Centrado em Telas Grandes)
 const MobileShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isDark } = useTheme();
   return (
-    <div className="min-h-screen bg-slate-900 md:bg-slate-950 flex items-center justify-center p-0 md:p-6 antialiased selection:bg-primary/30">
+    <div className={`min-h-screen flex items-center justify-center p-0 md:p-6 antialiased selection:bg-primary/30 shell-outer ${isDark ? 'bg-slate-950' : 'bg-slate-200'}`}>
       {/* Container simulando um smartphone em telas grandes e 100% full screen no celular */}
-      <div className="w-full max-w-md min-h-screen md:min-h-[844px] md:max-h-[920px] bg-background text-on-surface flex flex-col md:rounded-[40px] md:shadow-2xl md:border-8 md:border-slate-800 relative overflow-hidden">
+      <div className={`w-full max-w-md min-h-screen md:min-h-[844px] md:max-h-[920px] bg-background text-on-surface flex flex-col md:rounded-[40px] md:shadow-2xl md:border-8 relative overflow-hidden ${isDark ? 'md:border-slate-800' : 'md:border-slate-300'}`}>
         {/* Notch / Speaker visual apenas no desktop */}
-        <div className="hidden md:flex justify-center pt-2 pb-1 bg-surface z-50">
-          <div className="w-24 h-4 bg-slate-800 rounded-full flex items-center justify-center">
-            <div className="w-3 h-1 bg-slate-700 rounded-full"></div>
+        <div className={`hidden md:flex justify-center pt-2 pb-1 bg-surface z-50`}>
+          <div className={`w-24 h-4 rounded-full flex items-center justify-center ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
+            <div className={`w-3 h-1 rounded-full ${isDark ? 'bg-slate-700' : 'bg-slate-300'}`}></div>
           </div>
         </div>
         {children}
@@ -61,29 +63,31 @@ const PublicLayout: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Rotas Públicas */}
-        <Route element={<PublicLayout />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Route>
+    <ThemeProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Rotas Públicas */}
+          <Route element={<PublicLayout />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
 
-        {/* Rotas Protegidas com Layout Mobile */}
-        <Route element={<ProtectedLayout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/groups" element={<Groups />} />
-          <Route path="/groups/:id" element={<GroupDetails />} />
-          <Route path="/expenses/new" element={<AddExpense />} />
-          <Route path="/friends" element={<Friends />} />
-          <Route path="/activity" element={<Activity />} />
-          <Route path="/account" element={<Account />} />
-        </Route>
+          {/* Rotas Protegidas com Layout Mobile */}
+          <Route element={<ProtectedLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/groups" element={<Groups />} />
+            <Route path="/groups/:id" element={<GroupDetails />} />
+            <Route path="/expenses/new" element={<AddExpense />} />
+            <Route path="/friends" element={<Friends />} />
+            <Route path="/activity" element={<Activity />} />
+            <Route path="/account" element={<Account />} />
+          </Route>
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 

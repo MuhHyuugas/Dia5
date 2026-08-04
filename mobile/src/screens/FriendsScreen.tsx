@@ -9,13 +9,21 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
-  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { friendshipsService, Friend } from '../services/friendships.service';
 import { paymentsService, GlobalBalanceResponse } from '../services/payments.service';
+import { usersService, UserProfile } from '../services/users.service';
+import { CurrencyInput } from '../components/CurrencyInput';
 import { UserPlus, Users, Trash2, Wallet, X, Check } from 'lucide-react-native';
+import { useTheme } from '../theme/ThemeContext';
 
 export const FriendsScreen = () => {
+  const { colors } = useTheme();
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,7 +35,8 @@ export const FriendsScreen = () => {
   const [globalBalance, setGlobalBalance] = useState<GlobalBalanceResponse | null>(null);
 
   const [codigoPerfil, setCodigoPerfil] = useState('');
-  const [valorPago, setValorPago] = useState('');
+  /** Valor do pagamento em centavos */
+  const [valorPagoCents, setValorPagoCents] = useState(0);
   const [error, setError] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -104,24 +113,32 @@ export const FriendsScreen = () => {
   };
 
   const handleSettleDebt = async () => {
-    if (!selectedFriend) return;
+    if (!selectedFriend || !globalBalance) return;
     setError('');
 
-    const valor = parseFloat(valorPago);
-    if (isNaN(valor) || valor <= 0) {
+    if (valorPagoCents <= 0) {
       setError('Informe um valor válido.');
       return;
     }
 
     setActionLoading(true);
     try {
+      // Se o saldo global é a receber (> 0), o amigo te deve -> o amigo é o pagador e você o recebedor
+      // Se o saldo global é devendo (< 0), você deve -> você é o pagador e o amigo é o recebedor
+      const isFriendDevendo = globalBalance.saldoLiquido > 0;
+      const user = await usersService.getProfile();
+
+      const pagadorId = isFriendDevendo ? selectedFriend.id : user.id;
+      const recebedorId = isFriendDevendo ? user.id : selectedFriend.id;
+
       await paymentsService.settleDebt({
-        recebedorId: selectedFriend.id,
-        valorPago: valor,
+        pagadorId,
+        recebedorId,
+        valorPago: valorPagoCents / 100,
       });
 
       setIsSettleOpen(false);
-      setValorPago('');
+      setValorPagoCents(0);
       handleSelectFriend(selectedFriend);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao registrar liquidação.');
@@ -131,14 +148,14 @@ export const FriendsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>Amigos Conectados</Text>
-          <Text style={styles.subtitle}>Saldos cruzados consolidados entre você e seus amigos.</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
+      <View style={[styles.header, { borderBottomColor: colors.surface }]}>
+        <View style={{ flex: 1, marginRight: 12 }}>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Amigos Conectados</Text>
+          <Text style={[styles.subtitle, { color: colors.textMuted }]}>Saldos cruzados consolidados entre você e seus amigos.</Text>
         </View>
 
-        <TouchableOpacity style={styles.addButton} onPress={() => setIsAddOpen(true)}>
+        <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.primary }]} onPress={() => setIsAddOpen(true)}>
           <UserPlus size={18} color="#ffffff" />
           <Text style={styles.addButtonText}>+ Amigo</Text>
         </TouchableOpacity>
@@ -149,16 +166,16 @@ export const FriendsScreen = () => {
         keyExtractor={(item) => item.id}
         ListFooterComponent={
           selectedFriend && globalBalance ? (
-            <View style={styles.globalCard}>
-              <View style={styles.globalHeader}>
+            <View style={[styles.globalCard, { backgroundColor: colors.surface, borderColor: colors.primary + '66' }]}>
+              <View style={[styles.globalHeader, { borderBottomColor: colors.border }]}>
                 <View>
-                  <Text style={styles.globalLabel}>BALANÇO GLOBAL CONSOLIDADO</Text>
-                  <Text style={styles.globalName}>{globalBalance.amigoNome}</Text>
-                  <Text style={styles.globalStatus}>{globalBalance.situacao}</Text>
+                  <Text style={[styles.globalLabel, { color: colors.textMuted }]}>BALANÇO GLOBAL CONSOLIDADO</Text>
+                  <Text style={[styles.globalName, { color: colors.textPrimary }]}>{globalBalance.amigoNome}</Text>
+                  <Text style={[styles.globalStatus, { color: colors.primary }]}>{globalBalance.situacao}</Text>
                 </View>
 
                 <TouchableOpacity
-                  style={styles.settleButton}
+                  style={[styles.settleButton, { backgroundColor: colors.secondary }]}
                   onPress={() => setIsSettleOpen(true)}
                 >
                   <Wallet size={16} color="#ffffff" />
@@ -166,14 +183,14 @@ export const FriendsScreen = () => {
                 </TouchableOpacity>
               </View>
 
-              <Text style={styles.discrimTitle}>DISCRIMINAÇÃO DAS DESPESAS EM COMUM:</Text>
+              <Text style={[styles.discrimTitle, { color: colors.textMuted }]}>DISCRIMINAÇÃO DAS DESPESAS EM COMUM:</Text>
               {globalBalance.discriminacao.map((item, idx) => (
-                <View key={idx} style={styles.discrimRow}>
-                  <Text style={styles.discrimDesc}>{item.descricao} ({item.grupo})</Text>
+                <View key={idx} style={[styles.discrimRow, { backgroundColor: colors.background }]}>
+                  <Text style={[styles.discrimDesc, { color: colors.textPrimary }]}>{item.descricao} ({item.grupo})</Text>
                   <Text
                     style={[
                       styles.discrimAmount,
-                      item.tipo === 'A RECEBER' ? styles.positiveText : styles.negativeText,
+                      { color: item.tipo === 'A RECEBER' ? colors.secondary : colors.danger },
                     ]}
                   >
                     {item.tipo === 'A RECEBER'
@@ -189,117 +206,145 @@ export const FriendsScreen = () => {
           <TouchableOpacity
             style={[
               styles.friendCard,
-              selectedFriend?.id === item.id && styles.friendCardSelected,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+              selectedFriend?.id === item.id && { borderColor: colors.primary, backgroundColor: colors.primaryBg },
             ]}
             onPress={() => handleSelectFriend(item)}
           >
             <View style={styles.friendInfo}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{item.nome.charAt(0).toUpperCase()}</Text>
+              <View style={[styles.avatar, { backgroundColor: colors.primaryBg }]}>
+                <Text style={[styles.avatarText, { color: colors.primary }]}>{item.nome.charAt(0).toUpperCase()}</Text>
               </View>
               <View>
-                <Text style={styles.friendName}>{item.nome}</Text>
-                <Text style={styles.friendCode}>Código: <Text style={{ color: '#7c3aed', fontWeight: 'bold' }}>{item.codigoPerfil}</Text></Text>
+                <Text style={[styles.friendName, { color: colors.textPrimary }]}>{item.nome}</Text>
+                <Text style={[styles.friendCode, { color: colors.textMuted }]}>Código: <Text style={{ color: colors.primary, fontWeight: 'bold' }}>{item.codigoPerfil}</Text></Text>
               </View>
             </View>
 
             <TouchableOpacity onPress={() => handleRemoveFriend(item.id, item.nome)}>
-              <Trash2 size={18} color="#ef4444" />
+              <Trash2 size={18} color={colors.danger} />
             </TouchableOpacity>
           </TouchableOpacity>
         )}
         ListEmptyComponent={
           loading ? (
-            <ActivityIndicator color="#7c3aed" style={{ marginTop: 32 }} />
+            <ActivityIndicator color={colors.primary} style={{ marginTop: 32 }} />
           ) : (
             <View style={styles.emptyContainer}>
-              <Users size={54} color="#64748b" />
-              <Text style={styles.emptyTitle}>Nenhum amigo adicionado</Text>
-              <Text style={styles.emptyText}>Peça o código de 6 dígitos do perfil do seu amigo.</Text>
+              <Users size={54} color={colors.textMuted} />
+              <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>Nenhum amigo adicionado</Text>
+              <Text style={[styles.emptyText, { color: colors.textMuted }]}>Peça o código de 6 dígitos do perfil do seu amigo.</Text>
             </View>
           )
         }
-        contentContainerStyle={{ padding: 16 }}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
       />
 
       {/* Modal Adicionar Amigo por Código */}
       <Modal visible={isAddOpen} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Adicionar Amigo por Código</Text>
-              <TouchableOpacity onPress={() => setIsAddOpen(false)}>
-                <X size={20} color="#94a3b8" />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <KeyboardAvoidingView
+            style={styles.modalOverlay}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          >
+            <View style={[styles.modalContent, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Adicionar Amigo por Código</Text>
+                <TouchableOpacity onPress={() => setIsAddOpen(false)}>
+                  <X size={20} color={colors.textMuted} />
+                </TouchableOpacity>
+              </View>
+
+              {!!error && <Text style={[styles.modalError, { color: colors.danger }]}>{error}</Text>}
+
+              <Text style={[styles.inputLabel, { color: colors.textMuted }]}>CÓDIGO DE PERFIL (6 DÍGITOS)</Text>
+              <TextInput
+                style={[styles.modalInput, styles.codeInput, { backgroundColor: colors.background, borderColor: colors.border, color: colors.primary }]}
+                placeholder="Ex: BRE123"
+                placeholderTextColor={colors.textMuted}
+                maxLength={6}
+                autoCapitalize="characters"
+                value={codigoPerfil}
+                onChangeText={(val) => setCodigoPerfil(val.toUpperCase())}
+              />
+
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: colors.primary }]}
+                onPress={handleAddFriend}
+                disabled={actionLoading}
+              >
+                {actionLoading ? (
+                  <ActivityIndicator color="#ffffff" />
+                ) : (
+                  <Text style={styles.modalButtonText}>Conectar Amigo</Text>
+                )}
               </TouchableOpacity>
             </View>
-
-            {!!error && <Text style={styles.modalError}>{error}</Text>}
-
-            <Text style={styles.inputLabel}>CÓDIGO DE PERFIL (6 DÍGITOS)</Text>
-            <TextInput
-              style={[styles.modalInput, styles.codeInput]}
-              placeholder="Ex: BRE123"
-              placeholderTextColor="#94a3b8"
-              maxLength={6}
-              autoCapitalize="characters"
-              value={codigoPerfil}
-              onChangeText={(val) => setCodigoPerfil(val.toUpperCase())}
-            />
-
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={handleAddFriend}
-              disabled={actionLoading}
-            >
-              {actionLoading ? (
-                <ActivityIndicator color="#ffffff" />
-              ) : (
-                <Text style={styles.modalButtonText}>Conectar Amigo</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
+          </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
       </Modal>
 
       {/* Modal Liquidar Dívida */}
       <Modal visible={isSettleOpen} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Liquidar Dívida com {selectedFriend?.nome}</Text>
-              <TouchableOpacity onPress={() => setIsSettleOpen(false)}>
-                <X size={20} color="#94a3b8" />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <KeyboardAvoidingView
+            style={styles.modalOverlay}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          >
+            <View style={[styles.modalContent, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <View style={styles.modalHeader}>
+                <View style={{ flex: 1, marginRight: 8 }}>
+                  <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+                    {globalBalance && globalBalance.saldoLiquido > 0
+                      ? `Receber de ${selectedFriend?.nome}`
+                      : `Pagar a ${selectedFriend?.nome}`}
+                  </Text>
+                  <Text style={{ fontSize: 12, color: colors.textMuted, marginTop: 2 }}>
+                    {globalBalance && globalBalance.saldoLiquido > 0
+                      ? `Confirme que ${selectedFriend?.nome} pagou o valor a você:`
+                      : `Confirme o valor pago a ${selectedFriend?.nome}:`}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => setIsSettleOpen(false)}>
+                  <X size={20} color={colors.textMuted} />
+                </TouchableOpacity>
+              </View>
+
+              {!!error && <Text style={[styles.modalError, { color: colors.danger }]}>{error}</Text>}
+
+              <Text style={[styles.inputLabel, { color: colors.textMuted }]}>VALOR DO ACERTO (R$)</Text>
+              <View style={[styles.settleInputWrapper, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                <Text style={[styles.settleCurrencySymbol, { color: colors.textMuted }]}>R$</Text>
+                <CurrencyInput
+                  valueCents={valorPagoCents}
+                  onChangeCents={setValorPagoCents}
+                  inputStyle={[styles.settleAmountInput, { color: colors.secondary }]}
+                  placeholderTextColor={colors.textMuted}
+                />
+              </View>
+
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: colors.secondary }]}
+                onPress={handleSettleDebt}
+                disabled={actionLoading}
+              >
+                {actionLoading ? (
+                  <ActivityIndicator color="#ffffff" />
+                ) : (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Check size={18} color="#ffffff" />
+                    <Text style={styles.modalButtonText}>
+                      {globalBalance && globalBalance.saldoLiquido > 0
+                        ? `Confirmar Recebimento`
+                        : `Confirmar Pagamento`}
+                    </Text>
+                  </View>
+                )}
               </TouchableOpacity>
             </View>
-
-            {!!error && <Text style={styles.modalError}>{error}</Text>}
-
-            <Text style={styles.inputLabel}>VALOR PAGO (R$)</Text>
-            <TextInput
-              style={[styles.modalInput, { fontSize: 20, fontWeight: 'bold', color: '#10b981' }]}
-              placeholder="0,00"
-              placeholderTextColor="#94a3b8"
-              keyboardType="numeric"
-              value={valorPago}
-              onChangeText={setValorPago}
-            />
-
-            <TouchableOpacity
-              style={[styles.modalButton, { backgroundColor: '#10b981' }]}
-              onPress={handleSettleDebt}
-              disabled={actionLoading}
-            >
-              {actionLoading ? (
-                <ActivityIndicator color="#ffffff" />
-              ) : (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Check size={18} color="#ffffff" />
-                  <Text style={styles.modalButtonText}>Confirmar Pagamento</Text>
-                </View>
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
+          </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
       </Modal>
     </SafeAreaView>
   );
@@ -308,7 +353,6 @@ export const FriendsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0b1326',
   },
   header: {
     flexDirection: 'row',
@@ -317,22 +361,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#171f33',
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#dae2fd',
   },
   subtitle: {
     fontSize: 12,
-    color: '#94a3b8',
   },
   addButton: {
     height: 40,
     paddingHorizontal: 14,
     borderRadius: 14,
-    backgroundColor: '#7c3aed',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
@@ -343,7 +383,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   friendCard: {
-    backgroundColor: '#171f33',
     borderRadius: 20,
     padding: 16,
     flexDirection: 'row',
@@ -351,11 +390,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#2d3449',
-  },
-  friendCardSelected: {
-    borderColor: '#7c3aed',
-    backgroundColor: 'rgba(124, 58, 237, 0.08)',
   },
   friendInfo: {
     flexDirection: 'row',
@@ -366,32 +400,26 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 16,
-    backgroundColor: 'rgba(124, 58, 237, 0.15)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
-    color: '#7c3aed',
     fontWeight: 'bold',
     fontSize: 18,
   },
   friendName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#dae2fd',
   },
   friendCode: {
     fontSize: 12,
-    color: '#94a3b8',
     marginTop: 2,
   },
   globalCard: {
-    backgroundColor: '#171f33',
     borderRadius: 24,
     padding: 16,
     marginTop: 16,
     borderWidth: 1,
-    borderColor: 'rgba(124, 58, 237, 0.4)',
     gap: 12,
   },
   globalHeader: {
@@ -399,29 +427,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     borderBottomWidth: 1,
-    borderBottomColor: '#2d3449',
     paddingBottom: 12,
   },
   globalLabel: {
     fontSize: 10,
     fontWeight: 'bold',
-    color: '#94a3b8',
     letterSpacing: 1,
   },
   globalName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#dae2fd',
     marginTop: 2,
   },
   globalStatus: {
     fontSize: 13,
     fontWeight: 'bold',
-    color: '#7c3aed',
     marginTop: 2,
   },
   settleButton: {
-    backgroundColor: '#10b981',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 12,
@@ -437,31 +460,22 @@ const styles = StyleSheet.create({
   discrimTitle: {
     fontSize: 10,
     fontWeight: 'bold',
-    color: '#94a3b8',
     letterSpacing: 1,
   },
   discrimRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#0b1326',
     padding: 10,
     borderRadius: 12,
   },
   discrimDesc: {
     fontSize: 12,
-    color: '#dae2fd',
     fontWeight: '500',
   },
   discrimAmount: {
     fontSize: 12,
     fontWeight: 'bold',
-  },
-  positiveText: {
-    color: '#10b981',
-  },
-  negativeText: {
-    color: '#ef4444',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -470,12 +484,10 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   emptyTitle: {
-    color: '#dae2fd',
     fontSize: 16,
     fontWeight: 'bold',
   },
   emptyText: {
-    color: '#94a3b8',
     fontSize: 13,
     textAlign: 'center',
   },
@@ -485,13 +497,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#171f33',
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     padding: 24,
     gap: 16,
     borderWidth: 1,
-    borderColor: '#2d3449',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -501,37 +511,48 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#dae2fd',
   },
   modalError: {
-    color: '#ef4444',
     fontSize: 13,
   },
   inputLabel: {
     fontSize: 11,
     fontWeight: 'bold',
-    color: '#94a3b8',
     letterSpacing: 1,
   },
   modalInput: {
-    backgroundColor: '#0b1326',
     borderWidth: 1,
-    borderColor: '#2d3449',
     borderRadius: 14,
     paddingHorizontal: 14,
     height: 50,
-    color: '#dae2fd',
     fontSize: 15,
   },
   codeInput: {
     textAlign: 'center',
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#7c3aed',
     letterSpacing: 4,
   },
+  settleInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    height: 60,
+  },
+  settleCurrencySymbol: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 6,
+  },
+  settleAmountInput: {
+    flex: 1,
+    fontSize: 26,
+    fontWeight: 'bold',
+    textAlign: 'right',
+  },
   modalButton: {
-    backgroundColor: '#7c3aed',
     height: 52,
     borderRadius: 16,
     alignItems: 'center',

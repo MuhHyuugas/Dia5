@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { authService } from './src/services/auth.service';
 
@@ -19,26 +20,31 @@ import { FriendsScreen } from './src/screens/FriendsScreen';
 import { ActivityScreen } from './src/screens/ActivityScreen';
 import { AccountScreen } from './src/screens/AccountScreen';
 
+import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
 import { LayoutDashboard, Users, UsersRound, ReceiptText, UserCheck } from 'lucide-react-native';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function MainTabs() {
+  const { colors, isDark } = useTheme();
+  const insets = useSafeAreaInsets();
+  // Altura dinâmica da tab bar: respeita o home indicator do iPhone
+  const tabBarHeight = 56 + insets.bottom;
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#0b1326',
-          borderTopColor: '#171f33',
+          backgroundColor: colors.tabBarBg,
+          borderTopColor: colors.tabBarBorder,
           borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
+          height: tabBarHeight,
+          paddingBottom: insets.bottom + 4,
           paddingTop: 6,
         },
-        tabBarActiveTintColor: '#7c3aed',
-        tabBarInactiveTintColor: '#64748b',
+        tabBarActiveTintColor: colors.tabActive,
+        tabBarInactiveTintColor: colors.tabInactive,
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: 'bold',
@@ -89,7 +95,8 @@ function MainTabs() {
   );
 }
 
-export default function App() {
+function AppNavigator() {
+  const { colors, isDark } = useTheme();
   const [initialRoute, setInitialRoute] = useState<'Login' | 'Onboarding' | 'MainTabs' | null>(null);
 
   useEffect(() => {
@@ -113,15 +120,15 @@ export default function App() {
 
   if (!initialRoute) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#0b1326', justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#7c3aed" />
+      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
     <NavigationContainer>
-      <StatusBar style="light" />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
@@ -131,5 +138,15 @@ export default function App() {
         <Stack.Screen name="AddExpense" component={AddExpenseScreen} />
       </Stack.Navigator>
     </NavigationContainer>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <AppNavigator />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

@@ -7,16 +7,23 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
-  SafeAreaView,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { groupsService, Group } from '../services/groups.service';
 import { expensesService, GroupBalanceResponse } from '../services/expenses.service';
 import { authService, AuthResponse } from '../services/auth.service';
+import { CurrencyInput } from '../components/CurrencyInput';
 import { ArrowLeft, Check, Calculator, AlertCircle } from 'lucide-react-native';
+import { useTheme } from '../theme/ThemeContext';
 
 export const AddExpenseScreen = ({ route, navigation }: any) => {
   const initialGroupId = route.params?.groupId || '';
+  const { colors } = useTheme();
 
   const [currentUser, setCurrentUser] = useState<AuthResponse | null>(null);
   const [groups, setGroups] = useState<Group[]>([]);
@@ -24,12 +31,13 @@ export const AddExpenseScreen = ({ route, navigation }: any) => {
   const [balance, setBalance] = useState<GroupBalanceResponse | null>(null);
 
   const [descricao, setDescricao] = useState('');
-  const [valorTotal, setValorTotal] = useState('');
+  /** Valor total em centavos. Ex: 1000 = R$ 10,00 */
+  const [valorTotalCents, setValorTotalCents] = useState(0);
   const [pagadorId, setPagadorId] = useState('');
   const [dataCompra, setDataCompra] = useState(new Date().toISOString().split('T')[0]);
 
-  // Cotas dos participantes { usuarioId: "50.00" }
-  const [participantShares, setParticipantShares] = useState<{ [usuarioId: string]: string }>({});
+  // Cotas dos participantes em centavos { usuarioId: 1000 }
+  const [participantShares, setParticipantShares] = useState<{ [usuarioId: string]: number }>({});
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -68,25 +76,26 @@ export const AddExpenseScreen = ({ route, navigation }: any) => {
 
   // Calculadora de Divisão Igualitária
   const handleAutoSplitEqual = () => {
-    if (!balance || !valorTotal) return;
-    const total = parseFloat(valorTotal);
-    if (isNaN(total) || total <= 0) return;
+    if (!balance || valorTotalCents <= 0) return;
 
     const count = balance.balancoIndividual.length;
     if (count === 0) return;
 
-    const share = (total / count).toFixed(2);
-    const shares: { [usuarioId: string]: string } = {};
-    balance.balancoIndividual.forEach((m) => {
-      shares[m.usuarioId] = share;
+    // Distribui em centavos e coloca o centavo restante no primeiro participante
+    const baseShare = Math.floor(valorTotalCents / count);
+    const remainder = valorTotalCents - baseShare * count;
+
+    const shares: { [usuarioId: string]: number } = {};
+    balance.balancoIndividual.forEach((m, i) => {
+      shares[m.usuarioId] = baseShare + (i === 0 ? remainder : 0);
     });
     setParticipantShares(shares);
   };
 
   const handleSubmit = async () => {
     setError('');
-    const total = parseFloat(valorTotal);
-    if (isNaN(total) || total <= 0) {
+
+    if (valorTotalCents <= 0) {
       setError('Informe um valor total válido.');
       return;
     }
@@ -97,9 +106,9 @@ export const AddExpenseScreen = ({ route, navigation }: any) => {
     }
 
     const participantesList = Object.entries(participantShares)
-      .map(([usuarioId, valStr]) => ({
+      .map(([usuarioId, cents]) => ({
         usuarioId,
-        valorDevido: parseFloat(valStr) || 0,
+        valorDevido: cents / 100,
       }))
       .filter((p) => p.valorDevido > 0);
 
@@ -109,12 +118,12 @@ export const AddExpenseScreen = ({ route, navigation }: any) => {
     }
 
     // FE01 - Validação de Divisão Inconsistente (RN03)
-    const somaPartes = participantesList.reduce((sum, p) => sum + p.valorDevido, 0);
-    if (Math.abs(somaPartes - total) > 0.01) {
+    const somaPartesCents = Object.values(participantShares).reduce((sum, c) => sum + c, 0);
+    if (somaPartesCents !== valorTotalCents) {
+      const somaStr = (somaPartesCents / 100).toFixed(2).replace('.', ',');
+      const totalStr = (valorTotalCents / 100).toFixed(2).replace('.', ',');
       setError(
-        `FE01 - Divisão Inconsistente: A soma das frações (R$ ${somaPartes.toFixed(
-          2,
-        )}) não bate com o valor total pago (R$ ${total.toFixed(2)}).`,
+        `FE01 - Divisão Inconsistente: A soma das frações (R$ ${somaStr}) não bate com o valor total (R$ ${totalStr}).`,
       );
       return;
     }
@@ -125,7 +134,7 @@ export const AddExpenseScreen = ({ route, navigation }: any) => {
         grupoId: selectedGroupId,
         pagadorId: pagadorId || currentUser?.userId || '',
         descricao,
-        valorTotal: total,
+        valorTotal: valorTotalCents / 100,
         dataCompra,
         participantes: participantesList,
       });
@@ -139,42 +148,46 @@ export const AddExpenseScreen = ({ route, navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <ArrowLeft size={20} color="#dae2fd" />
-        </TouchableOpacity>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.title}>Lançar Nova Despesa</Text>
-          <Text style={styles.subtitle}>Registre uma compra e defina a partilha.</Text>
-        </View>
-      </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <View style={[styles.header, { borderBottomColor: colors.border }]}>
+            <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.surface }]} onPress={() => navigation.goBack()}>
+              <ArrowLeft size={20} color={colors.textPrimary} />
+            </TouchableOpacity>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.title, { color: colors.textPrimary }]}>Lançar Nova Despesa</Text>
+              <Text style={[styles.subtitle, { color: colors.textMuted }]}>Registre uma compra e defina a partilha.</Text>
+            </View>
+          </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+          <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {!!error && (
-          <View style={styles.errorCard}>
-            <AlertCircle size={18} color="#ef4444" />
-            <Text style={styles.errorText}>{error}</Text>
+          <View style={[styles.errorCard, { backgroundColor: colors.dangerBg, borderColor: colors.danger + '50' }]}>
+            <AlertCircle size={18} color={colors.danger} />
+            <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>
           </View>
         )}
 
         {/* Escolha do Grupo */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>SELECIONAR GRUPO</Text>
+          <Text style={[styles.label, { color: colors.textMuted }]}>SELECIONAR GRUPO</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexDirection: 'row' }}>
             {groups.map((g) => (
               <TouchableOpacity
                 key={g.id}
                 style={[
                   styles.chipGroup,
-                  selectedGroupId === g.id && styles.chipGroupActive,
+                  { backgroundColor: colors.surface, borderColor: colors.border },
+                  selectedGroupId === g.id && { backgroundColor: colors.primary, borderColor: colors.primary },
                 ]}
                 onPress={() => setSelectedGroupId(g.id)}
               >
                 <Text
                   style={[
                     styles.chipGroupText,
-                    selectedGroupId === g.id && styles.chipGroupTextActive,
+                    { color: colors.textMuted },
+                    selectedGroupId === g.id && { color: '#ffffff' },
                   ]}
                 >
                   {g.nome}
@@ -186,52 +199,51 @@ export const AddExpenseScreen = ({ route, navigation }: any) => {
 
         {/* Descrição e Valor */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>DESCRIÇÃO DA COMPRA</Text>
+          <Text style={[styles.label, { color: colors.textMuted }]}>DESCRIÇÃO DA COMPRA</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
             placeholder="Ex: Mercado, Uber, Conta de Luz"
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor={colors.textMuted}
             value={descricao}
             onChangeText={setDescricao}
           />
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>VALOR TOTAL (R$)</Text>
-          <TextInput
-            style={[styles.input, styles.amountInput]}
-            placeholder="0,00"
-            placeholderTextColor="#94a3b8"
-            keyboardType="numeric"
-            value={valorTotal}
-            onChangeText={setValorTotal}
-          />
+          <Text style={[styles.label, { color: colors.textMuted }]}>VALOR TOTAL (R$)</Text>
+          <View style={[styles.input, styles.amountInputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.currencySymbol, { color: colors.textMuted }]}>R$</Text>
+            <CurrencyInput
+              valueCents={valorTotalCents}
+              onChangeCents={setValorTotalCents}
+              inputStyle={[styles.amountInput, { color: colors.primary }]}
+              placeholderTextColor={colors.textMuted}
+            />
+          </View>
         </View>
 
         {/* Divisão dos Participantes */}
-        <View style={styles.card}>
-          <View style={styles.splitHeader}>
-            <Text style={styles.cardTitle}>Divisão dos Participantes</Text>
-            <TouchableOpacity style={styles.calcButton} onPress={handleAutoSplitEqual}>
-              <Calculator size={14} color="#7c3aed" />
-              <Text style={styles.calcButtonText}>Divisão Igualitária</Text>
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <View style={[styles.splitHeader, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Divisão dos Participantes</Text>
+            <TouchableOpacity style={[styles.calcButton, { backgroundColor: colors.primaryBg }]} onPress={handleAutoSplitEqual}>
+              <Calculator size={14} color={colors.primary} />
+              <Text style={[styles.calcButtonText, { color: colors.primary }]}>Divisão Igualitária</Text>
             </TouchableOpacity>
           </View>
 
           {balance?.balancoIndividual.map((m) => (
             <View key={m.usuarioId} style={styles.participantRow}>
-              <Text style={styles.participantName}>{m.nome}</Text>
-              <View style={styles.shareInputWrapper}>
-                <Text style={styles.currencyPrefix}>R$</Text>
-                <TextInput
-                  style={styles.shareInput}
-                  placeholder="0,00"
-                  placeholderTextColor="#94a3b8"
-                  keyboardType="numeric"
-                  value={participantShares[m.usuarioId] || ''}
-                  onChangeText={(val) =>
-                    setParticipantShares({ ...participantShares, [m.usuarioId]: val })
+              <Text style={[styles.participantName, { color: colors.textPrimary }]}>{m.nome}</Text>
+              <View style={[styles.shareInputWrapper, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                <Text style={[styles.currencyPrefix, { color: colors.textMuted }]}>R$</Text>
+                <CurrencyInput
+                  valueCents={participantShares[m.usuarioId] ?? 0}
+                  onChangeCents={(cents) =>
+                    setParticipantShares({ ...participantShares, [m.usuarioId]: cents })
                   }
+                  inputStyle={[styles.shareInput, { color: colors.textPrimary }]}
+                  placeholderTextColor={colors.textMuted}
                 />
               </View>
             </View>
@@ -239,7 +251,7 @@ export const AddExpenseScreen = ({ route, navigation }: any) => {
         </View>
 
         <TouchableOpacity
-          style={[styles.submitButton, loading && { opacity: 0.6 }]}
+          style={[styles.submitButton, { backgroundColor: colors.primary }, loading && { opacity: 0.6 }]}
           onPress={handleSubmit}
           disabled={loading}
         >
@@ -253,184 +265,72 @@ export const AddExpenseScreen = ({ route, navigation }: any) => {
           )}
         </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
+    </KeyboardAvoidingView>
+  </TouchableWithoutFeedback>
+</SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0b1326',
-  },
+  container: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#171f33',
     gap: 12,
   },
-  backButton: {
-    padding: 8,
-    backgroundColor: '#171f33',
-    borderRadius: 12,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#dae2fd',
-  },
-  subtitle: {
-    fontSize: 12,
-    color: '#94a3b8',
-  },
-  content: {
-    padding: 16,
-    gap: 16,
-  },
+  backButton: { padding: 8, borderRadius: 12 },
+  title: { fontSize: 18, fontWeight: 'bold' },
+  subtitle: { fontSize: 12 },
+  content: { padding: 16, paddingBottom: 60, gap: 16 },
   errorCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.3)',
-    padding: 12,
-    borderRadius: 14,
-    gap: 8,
+    flexDirection: 'row', alignItems: 'center',
+    borderWidth: 1, padding: 12, borderRadius: 14, gap: 8,
   },
-  errorText: {
-    color: '#ef4444',
-    fontSize: 12,
-    flex: 1,
+  errorText: { fontSize: 12, flex: 1 },
+  inputGroup: { gap: 6 },
+  label: { fontSize: 11, fontWeight: 'bold', letterSpacing: 1 },
+  input: { borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, height: 50, fontSize: 15 },
+  amountInputWrapper: {
+    flexDirection: 'row', alignItems: 'center',
+    borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, height: 60,
   },
-  inputGroup: {
-    gap: 6,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: '#94a3b8',
-    letterSpacing: 1,
-  },
-  input: {
-    backgroundColor: '#171f33',
-    borderWidth: 1,
-    borderColor: '#2d3449',
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    height: 50,
-    color: '#dae2fd',
-    fontSize: 15,
-  },
-  amountInput: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#7c3aed',
-  },
+  currencySymbol: { fontSize: 16, fontWeight: 'bold', marginRight: 6 },
+  amountInput: { flex: 1, fontSize: 26, fontWeight: 'bold', textAlign: 'right' },
   chipGroup: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 14,
-    backgroundColor: '#171f33',
-    borderWidth: 1,
-    borderColor: '#2d3449',
-    marginRight: 8,
+    paddingHorizontal: 14, paddingVertical: 8,
+    borderRadius: 14, borderWidth: 1, marginRight: 8,
   },
-  chipGroupActive: {
-    backgroundColor: '#7c3aed',
-    borderColor: '#7c3aed',
-  },
-  chipGroupText: {
-    color: '#94a3b8',
-    fontSize: 13,
-    fontWeight: 'bold',
-  },
-  chipGroupTextActive: {
-    color: '#ffffff',
-  },
-  card: {
-    backgroundColor: '#171f33',
-    borderRadius: 24,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#2d3449',
-    gap: 12,
-  },
+  chipGroupText: { fontSize: 13, fontWeight: 'bold' },
+  card: { borderRadius: 24, padding: 16, borderWidth: 1, gap: 12 },
   splitHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#2d3449',
-    paddingBottom: 10,
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    borderBottomWidth: 1, paddingBottom: 10,
   },
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#dae2fd',
-  },
+  cardTitle: { fontSize: 14, fontWeight: 'bold' },
   calcButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(124, 58, 237, 0.15)',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 10,
-    gap: 4,
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, gap: 4,
   },
-  calcButtonText: {
-    color: '#7c3aed',
-    fontSize: 11,
-    fontWeight: 'bold',
-  },
+  calcButtonText: { fontSize: 11, fontWeight: 'bold' },
   participantRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 4,
+    flexDirection: 'row', justifyContent: 'space-between',
+    alignItems: 'center', paddingVertical: 4,
   },
-  participantName: {
-    fontSize: 14,
-    color: '#dae2fd',
-    fontWeight: '600',
-  },
+  participantName: { fontSize: 14, fontWeight: '600' },
   shareInputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#0b1326',
-    borderWidth: 1,
-    borderColor: '#2d3449',
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    width: 110,
-    height: 40,
+    flexDirection: 'row', alignItems: 'center',
+    borderWidth: 1, borderRadius: 12, paddingHorizontal: 10,
+    width: 110, height: 40,
   },
-  currencyPrefix: {
-    color: '#94a3b8',
-    fontSize: 12,
-    marginRight: 4,
-  },
-  shareInput: {
-    flex: 1,
-    color: '#dae2fd',
-    fontWeight: 'bold',
-    fontSize: 14,
-    textAlign: 'right',
-  },
+  currencyPrefix: { fontSize: 12, marginRight: 4 },
+  shareInput: { flex: 1, fontWeight: 'bold', fontSize: 14, textAlign: 'right' },
   submitButton: {
-    backgroundColor: '#7c3aed',
-    height: 54,
-    borderRadius: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 8,
+    height: 54, borderRadius: 16,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 8, marginTop: 8, elevation: 3,
   },
-  submitButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  submitButtonText: { color: '#ffffff', fontSize: 16, fontWeight: 'bold' },
 });

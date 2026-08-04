@@ -143,10 +143,11 @@ export class ExpensesService {
       relations: { participantes: true },
     });
 
-    // Busca liquidações no grupo
-    const payments = await this.paymentRepository.find({
+    // Busca liquidações no grupo (filtrando autopagamentos inválidos)
+    const rawPayments = await this.paymentRepository.find({
       where: { grupoId: groupId },
     });
+    const payments = rawPayments.filter((p) => p.pagadorId && p.recebedorId && p.pagadorId !== p.recebedorId);
 
     // Calcula o balanço financeiro individual de cada membro (RF11)
     const balances = members.map((m) => {
@@ -177,6 +178,7 @@ export class ExpensesService {
       return {
         usuarioId: uId,
         nome: m.usuario?.nome,
+        isGuest: Boolean(m.usuario?.isGuest),
         saldoLiquido: Math.round(saldoLiquido * 100) / 100,
         situacao: saldoLiquido > 0 ? 'A Receber' : saldoLiquido < 0 ? 'Devendo' : 'Quitado',
       };

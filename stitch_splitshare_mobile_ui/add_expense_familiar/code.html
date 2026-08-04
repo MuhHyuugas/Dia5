@@ -1,0 +1,294 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "tertiary-fixed-dim": "#ffb3b0",
+                "surface-dim": "#0b1326",
+                "on-primary": "#3f008e",
+                "outline-variant": "#4a4455",
+                "on-tertiary": "#670211",
+                "on-tertiary-fixed": "#410006",
+                "surface-container-highest": "#2d3449",
+                "primary-fixed-dim": "#d2bbff",
+                "on-background": "#dae2fd",
+                "secondary-fixed": "#6dfe9c",
+                "tertiary": "#ffb3b0",
+                "inverse-surface": "#dae2fd",
+                "surface-container-low": "#131b2e",
+                "on-primary-container": "#ede0ff",
+                "on-secondary-fixed-variant": "#005227",
+                "on-tertiary-container": "#ffdedc",
+                "surface-container-high": "#222a3d",
+                "on-primary-fixed": "#25005a",
+                "on-error": "#690005",
+                "surface-variant": "#2d3449",
+                "on-tertiary-fixed-variant": "#881d24",
+                "error-container": "#93000a",
+                "background": "#0b1326",
+                "tertiary-container": "#b33e41",
+                "on-primary-fixed-variant": "#5a00c6",
+                "on-secondary": "#003919",
+                "secondary": "#4de082",
+                "on-secondary-container": "#003e1c",
+                "primary-fixed": "#eaddff",
+                "tertiary-fixed": "#ffdad8",
+                "inverse-primary": "#732ee4",
+                "surface-container": "#171f33",
+                "on-surface-variant": "#ccc3d8",
+                "outline": "#958da1",
+                "secondary-fixed-dim": "#4de082",
+                "on-surface": "#dae2fd",
+                "secondary-container": "#00b55d",
+                "on-secondary-fixed": "#00210c",
+                "on-error-container": "#ffdad6",
+                "error": "#ffb4ab",
+                "primary-container": "#7c3aed",
+                "surface-bright": "#31394d",
+                "primary": "#d2bbff",
+                "surface-tint": "#d2bbff",
+                "inverse-on-surface": "#283044",
+                "surface-container-lowest": "#060e20",
+                "surface": "#0b1326"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "stack-lg": "24px",
+                "section-gap": "48px",
+                "base": "8px",
+                "stack-sm": "4px",
+                "gutter": "16px",
+                "stack-md": "12px",
+                "container-margin-desktop": "40px",
+                "container-margin-mobile": "20px"
+        },
+        "fontFamily": {
+                "numeric-xl": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "label-caps": [
+                        "Inter"
+                ],
+                "display-lg-mobile": [
+                        "Inter"
+                ],
+                "display-lg": [
+                        "Inter"
+                ],
+                "headline-md": [
+                        "Inter"
+                ],
+                "body-lg": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "numeric-xl": [
+                        "36px",
+                        {
+                                "lineHeight": "44px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-caps": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg-mobile": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ios-input-focus:focus {
+            outline: none;
+            border-bottom-color: #7c3aed;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-header {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="font-body-md text-slate-800 selection:bg-purple-100 selection:text-purple-900">
+<!-- Top Navigation Bar -->
+<header class="docked w-full top-0 sticky bg-white/90 glass-header border-b border-slate-200 flex justify-between items-center px-container-margin-mobile h-16 z-50">
+<div class="flex items-center gap-3">
+<button class="material-symbols-outlined text-slate-600 hover:opacity-80 transition-opacity p-2 -ml-2">close</button>
+<img src="https://lh3.googleusercontent.com/aida/AP1WRLvN9tVxIXdvfY_djKHbJJs4JIaC7J2TyhfY7vpTPxbpkCgsxRiHmBGBqocTgNI4JmhbzKpr7Rdt9unuHu8evrlWWvYAJQAuC-EwlLi7g5uN79EcOUT0-ziTqmAc_YFuS6Xt3SLo2TSCoCdOI-4rYXStZtjw2xjOygUJeUmBEP-XgFsjr6isKS-yFF-Youkb93lvrlN8am1_F-QNrWgBBtRtJKWYir07ZTRThKzuFxk_XFuKLszjXrRnbUA" alt="Dia 5 Logo" class="h-8 w-auto object-contain">
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-slate-200">
+<img class="w-full h-full object-cover" data-alt="A professional studio headshot of a smiling young Brazilian woman with curly dark hair. She is wearing a modern, minimalist white linen shirt against a clean, soft-lit lavender studio background. The image has a premium, high-contrast Dribbble aesthetic with crisp focus and professional lighting that highlights her friendly expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrd_pMSoSi-yFxIZDwjVFKr0w4tmubu7floqwhq_08ztVIPWN5VI_soRvYbnmAcKtRRPeOHa36K2AaPDhBXyjn7X5S9JS2EgxZ5LsrZmZoC7b7Kjy4iUdiY-ZZC9rFvl_vJSYj5Gl2yyy3y29gwvHbvNzGlbAO9wrNV9c8cTNVrDs9d0b1-4hghSZ5CLgrhZm9Z6WO5JfBrwJ7mCVg2nwarj6XZyj4z9qcVbZg1OpNu5UgM50d7p5IeqsJeyYG6F9RN4ZGCZw1SL1k">
+</div>
+</header>
+<main class="max-w-xl mx-auto px-container-margin-mobile pb-32">
+<!-- Section: Header Amount -->
+<section class="py-8 text-center">
+<div class="inline-flex flex-col items-center gap-4 w-full">
+<div class="w-full max-w-xs">
+<label class="block text-sm font-medium text-slate-500 mb-1" for="amount">Valor</label>
+<input class="w-full text-center bg-white border border-slate-300 rounded-lg py-3 px-4 font-numeric-xl text-numeric-xl text-slate-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-slate-400 shadow-sm" id="amount" type="text" value="R$ 450,00">
+</div>
+<div class="w-full max-w-xs">
+<label class="block text-sm font-medium text-slate-500 mb-1" for="description">Descrição</label>
+<input class="w-full bg-white border border-slate-300 rounded-lg py-3 px-4 text-center font-body-lg text-body-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 placeholder:text-slate-400 text-slate-900 shadow-sm" id="description" placeholder="Ex: Ingressos Marina Sena" type="text" value="Ingressos Marina Sena">
+</div>
+</div>
+</section>
+<!-- Section: Payer -->
+<section class="mt-4">
+<h3 class="font-label-caps text-label-caps text-slate-500 mb-2 uppercase tracking-widest">Pago por</h3>
+<div class="bg-white rounded-xl p-4 flex items-center justify-between border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors cursor-pointer group">
+<div class="flex items-center gap-stack-md">
+<div class="w-12 h-12 rounded-full overflow-hidden border border-slate-200">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of a young man with light beard and glasses, looking stylishly into the camera. He is in a brightly lit modern office environment with subtle glass partitions in the background. The lighting is warm and natural, following a clean light-mode UI aesthetic. The overall mood is approachable and professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwt_SJqwqLKLh7MUNpZxi0seA9DCRVnHeESGnbisISieiutNte58NZOD4udiaWV1F3NRzul7NxbpZj5QZJFswxyRMJjDc6Jh6_70shRA_JDDH9cwL2_Xk9-06zUBGFYY4sOpzaXrW_EnvZ5AUfvxdrCQcJGmziqbpd6XD1lzyVLRMZoLlzhpsX40tyToUuTP-GMnwr9ndO-BmjL4RSrlcCplL70PxcHmxgmxuR1_A85_o-45D0sIzhC8tqm66HlFYduy1Zb63171lu">
+</div>
+<div>
+<p class="font-body-md text-slate-900 font-semibold">Você</p>
+<p class="text-[14px] text-slate-500">Individualmente</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400 group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</section>
+<!-- Section: Split Details -->
+<section class="mt-8">
+<div class="flex justify-between items-center mb-2">
+<h3 class="font-label-caps text-label-caps text-slate-500 uppercase tracking-widest">Dividido entre</h3>
+<button class="text-purple-600 font-label-caps text-label-caps hover:underline transition-all">Editar</button>
+</div>
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden divide-y divide-slate-100">
+<!-- User 1 -->
+<div class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="A portrait of a cheerful person with short blonde hair and a friendly smile, wearing a casual denim jacket. The background is a soft-focus urban park with greenery and sunlight filtering through trees. High-key lighting creates a vibrant, clean feel consistent with a modern mobile app dashboard. The style is minimalist and clean." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6qnbnYY3kyMefl7e_ImeMjYyovGq7zjcRq3J1oOw_oyfiSixPwIGeynFai7IpK4JXUSoGFK_JkY_Zf-MQDziDiuSmBEsSzWOOl2MvFYsu-zlDXCx3ciQGZ762gONo3bMuycmoodX9ZoyUeizN5JNZoJ_wtLCWuNhlpEq3KMi1DrK4fZjpqCdnXoKCNKqOWqG1SGjaUbYlqXFa8ZNPNzth4X90gQG9xf-YkWu5TfexgE7okFJVwujdakI3bIvvSilC4zyK-CV6yfei">
+</div>
+<span class="font-body-md font-medium text-slate-900">Bia Mendes</span>
+</div>
+<span class="font-body-md font-semibold text-slate-900">R$ 150,00</span>
+</div>
+<!-- User 2 -->
+<div class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="A portrait of a man with dark features and a short beard, wearing a black turtleneck. He has a calm, confident expression. The background is a minimalist grey wall with soft directional lighting creating subtle depth. The image is clean, high-resolution, and perfectly centered for a UI avatar component." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9ZDX9uVj6nGtNwpS_tabfkyXBzLe7bJa-43cOnBLWLTmukgfPpHq7D3NCrqLgRrT_Mwtg60q8XBkwIegcmaDDYSUXcBp2iTv4TmrbSPRiKaKuAkqf46bQM82hvpfa3Oskj8PV6s49BdLFxmo39YC5YhyQIdHh73iws0Zd8cRCm_UC_keXj_-4NSzjV0hf1GkIrAP8lOj8v_KexeOMUIQ8e7hUGVEjRRcK3Y6BUXo_19KdRNLt4AW5DMjD774zEOinttev6L8ZyIHV">
+</div>
+<span class="font-body-md font-medium text-slate-900">Carlos Lima</span>
+</div>
+<span class="font-body-md font-semibold text-slate-900">R$ 150,00</span>
+</div>
+<!-- User 3 -->
+<div class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-orange-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-orange-600">person</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-md font-medium text-slate-900">Visitante</span>
+<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-[11px] font-medium rounded border border-slate-200">Guest</span>
+</div>
+</div>
+<span class="font-body-md font-semibold text-slate-900">R$ 150,00</span>
+</div>
+</div>
+<!-- More options -->
+<button class="w-full mt-4 flex items-center justify-center gap-2 py-3 rounded-lg border border-slate-300 text-slate-600 font-medium hover:bg-slate-50 transition-colors bg-white shadow-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Adicionar Pessoa
+            </button>
+</section>
+<!-- Category & Date Chips -->
+<section class="mt-8 flex flex-wrap gap-2">
+<div class="px-4 py-2 bg-purple-50 rounded-full border border-purple-200 flex items-center gap-2 cursor-pointer hover:bg-purple-100 transition-colors">
+<span class="material-symbols-outlined text-[18px] text-purple-600" style="font-variation-settings: 'FILL' 1;">confirmation_number</span>
+<span class="font-medium text-sm text-purple-700">Entretenimento</span>
+</div>
+<div class="px-4 py-2 bg-white rounded-full border border-slate-300 flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-slate-500">calendar_today</span>
+<span class="font-medium text-sm text-slate-700">Hoje</span>
+</div>
+</section>
+</main>
+<!-- Footer Action -->
+<footer class="fixed bottom-0 left-0 w-full p-container-margin-mobile bg-white border-t border-slate-200 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<button class="w-full bg-purple-600 text-white py-4 rounded-lg font-headline-md text-[18px] font-semibold hover:bg-purple-700 active:bg-purple-800 transition-colors flex items-center justify-center gap-2 shadow-sm">
+            Salvar Despesa
+        </button>
+</footer>
+<script>
+        // Numeric input formatting (simulated)
+        const amountInput = document.getElementById('amount');
+        amountInput.addEventListener('focus', function() {
+            if(this.value === "R$ 0,00") this.value = "R$ ";
+        });
+    </script>
+
+
+</body></html>

@@ -115,12 +115,24 @@ export const Dashboard: React.FC = () => {
         )}
       </section>
 
-      <section className="bg-primary/5 p-4 rounded-2xl border border-primary/10 flex items-start gap-3">
-        <div className="p-2 bg-primary/10 text-primary rounded-xl mt-0.5">
+      <section className="bg-primary/5 p-4 rounded-2xl border border-primary/10 flex items-start gap-3 cursor-pointer hover:bg-primary/10 transition-colors" onClick={() => window.location.href = '/account'}>
+        <div className="p-2 bg-primary/10 text-primary rounded-xl mt-0.5 shrink-0">
           <TrendingUp className="w-5 h-5" />
         </div>
         <div>
-          <h4 className="text-xs font-bold text-primary uppercase tracking-wider">Dica Inteligente Dia 5</h4>
+          <h4 className="text-xs font-bold text-primary uppercase tracking-wider">Aprenda a Usar o Dia 5</h4>
+          <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
+            Acesse o <strong className="text-primary">Tutorial de Uso</strong> em "Conta" e domine todas as funcionalidades em 5 passos simples!
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-secondary/5 p-4 rounded-2xl border border-secondary/10 flex items-start gap-3">
+        <div className="p-2 bg-secondary/10 text-secondary rounded-xl mt-0.5">
+          <TrendingUp className="w-5 h-5" />
+        </div>
+        <div>
+          <h4 className="text-xs font-bold text-secondary uppercase tracking-wider">Dica Inteligente Dia 5</h4>
           <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
             Compartilhe o código do grupo ou adicione Usuários Convidados (Shadow Users) para dividir despesas mesmo com quem não tem o aplicativo!
           </p>

@@ -1,6 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 @import "tailwindcss";
 
+/* ================================================================
+   Dia 5 - Design System: Tokens de Cor (Light Mode - Padrão)
+   ================================================================ */
 @theme {
   --color-primary: #7c3aed;
   --color-primary-dark: #6d28d9;
@@ -14,9 +17,54 @@
   --color-outline: #e2e8f0;
 }
 
+/* ================================================================
+   Variáveis CSS Base (Light Mode)
+   ================================================================ */
 :root {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  color-scheme: light dark;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-elevated: #f1f5f9;
+  --border: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-muted: #64748b;
+  --primary: #7c3aed;
+  --primary-bg: rgba(124, 58, 237, 0.1);
+  --secondary: #10b981;
+  --secondary-bg: rgba(16, 185, 129, 0.1);
+  --danger: #ef4444;
+  --transition-theme: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ================================================================
+   Dark Mode (via data-theme="dark")
+   ================================================================ */
+[data-theme="dark"] {
+  --bg: #0b1326;
+  --surface: #171f33;
+  --surface-elevated: #1e2740;
+  --border: #2d3449;
+  --text-primary: #dae2fd;
+  --text-muted: #94a3b8;
+  --primary: #7c3aed;
+  --primary-bg: rgba(124, 58, 237, 0.15);
+  --secondary: #10b981;
+  --secondary-bg: rgba(16, 185, 129, 0.15);
+  --danger: #ef4444;
+
+  /* Override Tailwind colors in dark mode */
+  --color-surface: #171f33;
+  --color-background: #0b1326;
+  --color-on-surface: #dae2fd;
+  --color-on-surface-variant: #94a3b8;
+  --color-outline: #2d3449;
+}
+
+/* ================================================================
+   Base Styles
+   ================================================================ */
+* {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.15s ease;
 }
 
 .material-symbols-outlined {
@@ -47,4 +95,14 @@ body {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+[data-theme="dark"] .glass-card {
+  background: rgba(23, 31, 51, 0.85);
+  border: 1px solid rgba(45, 52, 73, 0.8);
+}
+
+/* Shell Outer Background */
+[data-theme="dark"] .shell-outer {
+  background-color: #050b18 !important;
 }

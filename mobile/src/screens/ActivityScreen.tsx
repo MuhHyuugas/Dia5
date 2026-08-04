@@ -5,12 +5,14 @@ import {
   View,
   FlatList,
   ActivityIndicator,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { groupsService, ActivityItem } from '../services/groups.service';
 import { Receipt, Calendar } from 'lucide-react-native';
+import { useTheme } from '../theme/ThemeContext';
 
 export const ActivityScreen = () => {
+  const { colors } = useTheme();
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +24,10 @@ export const ActivityScreen = () => {
     try {
       setLoading(true);
       const userGroups = await groupsService.getGroups();
-      const promises = userGroups.map((g) => groupsService.getGroupActivity(g.id));
+      const promises = userGroups.map(async (g) => {
+        const items = await groupsService.getGroupActivity(g.id);
+        return items.map((item) => ({ ...item, grupoNome: g.nome }));
+      });
       const results = await Promise.all(promises);
       const combined = results.flat().sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
       setActivities(combined);
@@ -34,101 +39,95 @@ export const ActivityScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Extrato & Atividades</Text>
-        <Text style={styles.subtitle}>Histórico cronológico de lançamentos e pagamentos.</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
+      <View style={[styles.header, { borderBottomColor: colors.surface }]}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>Extrato & Atividades</Text>
+        <Text style={[styles.subtitle, { color: colors.textMuted }]}>Histórico cronológico de lançamentos e pagamentos.</Text>
       </View>
 
       <FlatList
         data={activities}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View
               style={[
                 styles.iconBox,
-                item.tipo === 'DESPESA' ? styles.despesaIcon : styles.pagamentoIcon,
+                { backgroundColor: item.tipo === 'DESPESA' ? colors.primaryBg : colors.secondaryBg },
               ]}
             >
-              <Receipt size={20} color={item.tipo === 'DESPESA' ? '#7c3aed' : '#10b981'} />
+              <Receipt size={20} color={item.tipo === 'DESPESA' ? colors.primary : colors.secondary} />
             </View>
 
             <View style={{ flex: 1 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                 <Text
                   style={[
                     styles.typeBadge,
-                    item.tipo === 'DESPESA' ? styles.despesaBadge : styles.pagamentoBadge,
+                    item.tipo === 'DESPESA'
+                      ? { backgroundColor: colors.primaryBg, color: colors.primary }
+                      : { backgroundColor: colors.secondaryBg, color: colors.secondary },
                   ]}
                 >
                   {item.tipo}
                 </Text>
+                {!!item.grupoNome && (
+                  <View style={[styles.groupTag, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                    <Text style={[styles.groupTagText, { color: colors.primary }]}>{item.grupoNome}</Text>
+                  </View>
+                )}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Calendar size={12} color="#94a3b8" />
-                  <Text style={styles.dateText}>{new Date(item.data).toLocaleDateString()}</Text>
+                  <Calendar size={12} color={colors.textMuted} />
+                  <Text style={[styles.dateText, { color: colors.textMuted }]}>{new Date(item.data).toLocaleDateString()}</Text>
                 </View>
               </View>
 
-              <Text style={styles.cardTitle}>{item.descricao || 'Acerto de Contas'}</Text>
-              <Text style={styles.cardSub}>
+              <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>{item.descricao || 'Acerto de Contas'}</Text>
+              <Text style={[styles.cardSub, { color: colors.textMuted }]}>
                 {item.tipo === 'DESPESA'
                   ? `Pago por ${item.pagador}`
                   : `${item.pagador} pagou a ${item.recebedor}`}
               </Text>
             </View>
 
-            <Text style={styles.amount}>
+            <Text style={[styles.amount, { color: colors.textPrimary }]}>
               R$ {(item.valorTotal || item.valorPago || 0).toFixed(2)}
             </Text>
           </View>
         )}
         ListEmptyComponent={
           loading ? (
-            <ActivityIndicator color="#7c3aed" style={{ marginTop: 32 }} />
+            <ActivityIndicator color={colors.primary} style={{ marginTop: 32 }} />
           ) : (
             <View style={styles.emptyContainer}>
-              <Receipt size={54} color="#64748b" />
-              <Text style={styles.emptyTitle}>Nenhum lançamento registrado</Text>
-              <Text style={styles.emptyText}>Suas despesas aparecerão aqui em ordem cronológica.</Text>
+              <Receipt size={54} color={colors.textMuted} />
+              <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>Nenhum lançamento registrado</Text>
+              <Text style={[styles.emptyText, { color: colors.textMuted }]}>Suas despesas aparecerão aqui em ordem cronológica.</Text>
             </View>
           )
         }
-        contentContainerStyle={{ padding: 16 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
       />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0b1326',
-  },
+  container: { flex: 1 },
   header: {
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#171f33',
   },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#dae2fd',
-  },
-  subtitle: {
-    fontSize: 12,
-    color: '#94a3b8',
-  },
+  title: { fontSize: 22, fontWeight: 'bold' },
+  subtitle: { fontSize: 12 },
   card: {
-    backgroundColor: '#171f33',
     borderRadius: 20,
     padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#2d3449',
     gap: 12,
   },
   iconBox: {
@@ -138,12 +137,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  despesaIcon: {
-    backgroundColor: 'rgba(124, 58, 237, 0.15)',
-  },
-  pagamentoIcon: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-  },
   typeBadge: {
     fontSize: 10,
     fontWeight: 'bold',
@@ -151,48 +144,21 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 6,
   },
-  despesaBadge: {
-    backgroundColor: 'rgba(124, 58, 237, 0.2)',
-    color: '#7c3aed',
+  groupTag: {
+    borderWidth: 1,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
   },
-  pagamentoBadge: {
-    backgroundColor: 'rgba(16, 185, 129, 0.2)',
-    color: '#10b981',
-  },
-  dateText: {
-    fontSize: 11,
-    color: '#94a3b8',
-  },
-  cardTitle: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#dae2fd',
-    marginTop: 2,
-  },
-  cardSub: {
-    fontSize: 12,
-    color: '#94a3b8',
-    marginTop: 2,
-  },
-  amount: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: '#dae2fd',
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-    gap: 12,
-  },
-  emptyTitle: {
-    color: '#dae2fd',
-    fontSize: 16,
+  groupTagText: {
+    fontSize: 10,
     fontWeight: 'bold',
   },
-  emptyText: {
-    color: '#94a3b8',
-    fontSize: 13,
-    textAlign: 'center',
-  },
+  dateText: { fontSize: 11 },
+  cardTitle: { fontSize: 15, fontWeight: 'bold', marginTop: 2 },
+  cardSub: { fontSize: 12, marginTop: 2 },
+  amount: { fontSize: 15, fontWeight: 'bold' },
+  emptyContainer: { alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 },
+  emptyTitle: { fontSize: 16, fontWeight: 'bold' },
+  emptyText: { fontSize: 13, textAlign: 'center' },
 });

@@ -17,6 +17,7 @@ export interface GlobalBalanceResponse {
 }
 
 export interface CreatePaymentInput {
+  pagadorId?: string;
   recebedorId: string;
   grupoId?: string;
   valorPago: number;

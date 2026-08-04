@@ -17,6 +17,7 @@ export interface CreateExpenseInput {
 export interface GroupBalanceMember {
   usuarioId: string;
   nome: string;
+  isGuest?: boolean;
   saldoLiquido: number;
   situacao: 'A Receber' | 'Devendo' | 'Quitado';
 }

@@ -4,9 +4,8 @@ import {
   Text,
   View,
   TouchableOpacity,
-  SafeAreaView,
-  Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Users,
@@ -17,63 +16,66 @@ import {
   ArrowRight,
   ChevronLeft,
 } from 'lucide-react-native';
-
-const { width } = Dimensions.get('window');
+import { useTheme } from '../theme/ThemeContext';
 
 const TUTORIAL_SLIDES = [
   {
     id: '1',
     icon: Users,
-    iconColor: '#7c3aed',
-    badgeColor: 'rgba(124, 58, 237, 0.15)',
     title: 'Bem-vindo ao Dia 5! 👋',
     subtitle: 'Divisão de Contas sem Estresse',
     description:
       'O Dia 5 foi feito para você gerenciar despesas compartilhadas com amigos, repúblicas, viagens e festas de forma simples e transparente.',
+    accentKey: 'primary' as const,
   },
   {
     id: '2',
     icon: Users,
-    iconColor: '#10b981',
-    badgeColor: 'rgba(16, 185, 129, 0.15)',
     title: 'Criar ou Entrar em Grupos 🏠',
     subtitle: 'Código de Convite de 6 Dígitos',
     description:
       'Crie grupos para cada ocasião (ex: "Casa") ou entre no grupo do seu amigo usando o Código de Convite (ex: REP456).',
+    accentKey: 'secondary' as const,
   },
   {
     id: '3',
     icon: PlusCircle,
-    iconColor: '#3b82f6',
-    badgeColor: 'rgba(59, 130, 246, 0.15)',
     title: 'Divisão Inteligente de Contas 💸',
     subtitle: 'Divisão Igualitária ou Cotas',
     description:
       'Lance despesas e escolha entre divisão igualitária com 1 toque ou cotas personalizadas. O sistema valida se as partes somam o valor total pago!',
+    accentKey: 'blue' as const,
   },
   {
     id: '4',
     icon: UserPlus,
-    iconColor: '#f59e0b',
-    badgeColor: 'rgba(245, 158, 11, 0.15)',
     title: 'Convidados sem App (Shadow Users) 👤',
     subtitle: 'Ninguém Fica de Fora',
     description:
       'Adicione participantes sem o aplicativo instalado como Convidados. Quando a pessoa criar uma conta real, vincule o histórico e transfira o saldo!',
+    accentKey: 'amber' as const,
   },
   {
     id: '5',
     icon: Wallet,
-    iconColor: '#ec4899',
-    badgeColor: 'rgba(236, 72, 153, 0.15)',
     title: 'Conecte Amigos & Acerto de Contas 🤝',
     subtitle: 'Balanço Global & Liquidação',
     description:
       'Compartilhe seu Código de Perfil único, veja o saldo consolidado entre todos os grupos e registre liquidações de dívida em 1 clique.',
+    accentKey: 'pink' as const,
   },
 ];
 
+const ACCENT_COLORS: Record<string, { icon: string; bg: string; }> = {
+  primary: { icon: '#7c3aed', bg: 'rgba(124, 58, 237, 0.15)' },
+  secondary: { icon: '#10b981', bg: 'rgba(16, 185, 129, 0.15)' },
+  blue: { icon: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)' },
+  amber: { icon: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' },
+  pink: { icon: '#ec4899', bg: 'rgba(236, 72, 153, 0.15)' },
+};
+
 export const OnboardingScreen = ({ navigation, route }: any) => {
+  const { colors } = useTheme();
   const isReplay = route.params?.isReplay || false;
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -102,37 +104,43 @@ export const OnboardingScreen = ({ navigation, route }: any) => {
 
   const slide = TUTORIAL_SLIDES[currentIndex];
   const IconComponent = slide.icon;
+  const accent = ACCENT_COLORS[slide.accentKey];
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Botão Pular / Fechar */}
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Top Bar */}
       <View style={styles.topBar}>
         {currentIndex > 0 ? (
-          <TouchableOpacity style={styles.navIconBtn} onPress={handlePrev}>
-            <ChevronLeft size={20} color="#dae2fd" />
+          <TouchableOpacity
+            style={[styles.navIconBtn, { backgroundColor: colors.surface }]}
+            onPress={handlePrev}
+          >
+            <ChevronLeft size={20} color={colors.textPrimary} />
           </TouchableOpacity>
         ) : (
           <View style={{ width: 40 }} />
         )}
 
         <TouchableOpacity onPress={finishTutorial}>
-          <Text style={styles.skipText}>{isReplay ? 'Fechar' : 'Pular Tutorial'}</Text>
+          <Text style={[styles.skipText, { color: colors.textMuted }]}>{isReplay ? 'Fechar' : 'Pular Tutorial'}</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Conteúdo do Slide */}
+      {/* Slide Content */}
       <View style={styles.slideContainer}>
-        <View style={[styles.iconBadge, { backgroundColor: slide.badgeColor }]}>
-          <IconComponent size={56} color={slide.iconColor} />
+        <View style={[styles.iconBadge, { backgroundColor: accent.bg }]}>
+          <IconComponent size={56} color={accent.icon} />
         </View>
 
-        <Text style={styles.stepTag}>PASSO {currentIndex + 1} DE {TUTORIAL_SLIDES.length}</Text>
-        <Text style={styles.title}>{slide.title}</Text>
-        <Text style={styles.subtitle}>{slide.subtitle}</Text>
-        <Text style={styles.description}>{slide.description}</Text>
+        <Text style={[styles.stepTag, { color: colors.primary }]}>
+          PASSO {currentIndex + 1} DE {TUTORIAL_SLIDES.length}
+        </Text>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>{slide.title}</Text>
+        <Text style={[styles.subtitle, { color: colors.secondary }]}>{slide.subtitle}</Text>
+        <Text style={[styles.description, { color: colors.textMuted }]}>{slide.description}</Text>
       </View>
 
-      {/* Indicadores de Progresso em Pontos */}
+      {/* Footer */}
       <View style={styles.footer}>
         <View style={styles.dotsContainer}>
           {TUTORIAL_SLIDES.map((_, idx) => (
@@ -140,14 +148,18 @@ export const OnboardingScreen = ({ navigation, route }: any) => {
               key={idx}
               style={[
                 styles.dot,
-                idx === currentIndex ? styles.activeDot : styles.inactiveDot,
+                idx === currentIndex
+                  ? { width: 28, backgroundColor: colors.primary }
+                  : { width: 8, backgroundColor: colors.border },
               ]}
             />
           ))}
         </View>
 
-        {/* Botão Avançar / Concluir */}
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+        <TouchableOpacity
+          style={[styles.nextButton, { backgroundColor: colors.primary, shadowColor: colors.primary }]}
+          onPress={handleNext}
+        >
           {currentIndex === TUTORIAL_SLIDES.length - 1 ? (
             <>
               <Text style={styles.nextButtonText}>Começar a Usar!</Text>
@@ -168,7 +180,6 @@ export const OnboardingScreen = ({ navigation, route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0b1326',
     justifyContent: 'space-between',
   },
   topBar: {
@@ -180,11 +191,9 @@ const styles = StyleSheet.create({
   },
   navIconBtn: {
     padding: 8,
-    backgroundColor: '#171f33',
     borderRadius: 12,
   },
   skipText: {
-    color: '#94a3b8',
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -205,26 +214,22 @@ const styles = StyleSheet.create({
   stepTag: {
     fontSize: 11,
     fontWeight: 'bold',
-    color: '#7c3aed',
     letterSpacing: 1.5,
     marginBottom: 8,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#dae2fd',
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#10b981',
     marginTop: 4,
     textAlign: 'center',
   },
   description: {
     fontSize: 14,
-    color: '#94a3b8',
     textAlign: 'center',
     marginTop: 14,
     lineHeight: 22,
@@ -243,16 +248,7 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
   },
-  activeDot: {
-    width: 28,
-    backgroundColor: '#7c3aed',
-  },
-  inactiveDot: {
-    width: 8,
-    backgroundColor: '#2d3449',
-  },
   nextButton: {
-    backgroundColor: '#7c3aed',
     height: 56,
     borderRadius: 18,
     flexDirection: 'row',
@@ -260,7 +256,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
     elevation: 4,
-    shadowColor: '#7c3aed',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

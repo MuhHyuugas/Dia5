@@ -1,12 +1,13 @@
 <div align="center">
   
-# 💸 Dia5
+# 💸 Dia 5 - Divisão Inteligente de Despesas
 
-[![.NET](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](#)
+[![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](#)
 [![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](#)
+[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](#)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](#)
 
-*Aplicativo moderno para divisão de despesas, gestão de repúblicas e acertos de contas entre amigos, desenhado com arquitetura limpa.*
+*Aplicativo moderno para divisão de despesas, gestão de repúblicas e acertos de contas entre amigos, desenhado com arquitetura limpa e sincronização em tempo real.*
 
 </div>
 
@@ -14,125 +15,92 @@
 
 ## 📌 Sobre o Projeto
 
-O **Dia5** é um aplicativo projetado para resolver o problema clássico de "quem deve a quem" em rolês, viagens e na convivência diária. Diferente de soluções comuns, ele possui a funcionalidade de **Shadow Users** (Usuários Convidados), permitindo adicionar amigos que não têm o app na divisão de contas, e depois vincular o histórico deles quando decidirem se cadastrar.
+O **Dia 5** é uma solução completa (Mobile e Web) projetada para resolver o problema de "quem deve quanto a quem" em viagens, repúblicas e encontros de amigos. 
 
-## 🚀 Principais Funcionalidades
+Diferente de soluções genéricas, o **Dia 5** conta com suporte nativo a **Shadow Users (Convidados sem App)**: você pode adicionar participantes que ainda não baixaram o aplicativo, controlar os gastos deles e, quando eles criarem uma conta, migrar todo o histórico através de um **Código de Perfil Único**.
 
-* **Grupos de Despesas:** Crie grupos para eventos específicos e compartilhe um código de convite com seus amigos.
-* **Shadow Users:** Inclua pessoas sem conta na divisão. Se elas baixarem o app depois, vincule o perfil facilmente através de um código!
-* **Divisão Inteligente:** Registre quem pagou, defina quem participou e o sistema cuidará da matemática para que a conta feche exatamente.
-* **Balanço Global (Acerto de Contas):** Veja de forma consolidada quanto você deve a cada amigo, cruzando os saldos de diferentes grupos.
+---
 
-## 🏗️ Arquitetura e Stack
+## 🚀 Funcionalidades Principais
 
-O projeto segue os princípios de **Clean Architecture** (Arquitetura Limpa), separando o Domínio, a Aplicação e a Infraestrutura para garantir que a API seja facilmente testável e escalável.
+* **Grupos de Despesas:** Crie e gerencie grupos personalizados com código de convite único.
+* **Shadow Users (Sem App):** Adicione convidados sem aplicativo nas despesas e dê baixa em pagamentos por eles.
+* **Vincular Perfil Fantasma:** Transfira todo o histórico do convidado quando ele instalar o app usando o Código de Perfil de 6 dígitos.
+* **Balanço Geral Consolidado:** Acompanhe em tempo real na tela inicial quanto você tem a receber ou deve somando todos os seus grupos.
+* **Acerto Inteligente de Contas (Liquidar Dívida):** Transações direcionadas entre devedores e credores com aviso claro de quem pagou quem.
+* **Input de Valores Estilo Banco:** Digitação simplificada e sem bugs iniciada em `0,00` com deslize/toque fora para dispensar o teclado.
+* **Personalização de Perfil:** Escolha entre uma coleção de avatares modernos ou informe a URL da sua foto.
+* **Interface Responsiva e Safe Area:** Otimizada para iPhone, iPad e telas Android.
 
-* **Frontend:** React Native 
-* **Backend:** C# (.NET Core)
-* **Banco de Dados:** PostgreSQL com Entity Framework Core (EF Core)
+---
 
-### Diagrama de Dependências (.NET)
+## 🏗️ Arquitetura e Stack Tecnológica
 
-```mermaid
-classDiagram
-    direction BT
+* **Backend:** Node.js (NestJS + TypeORM + JWT + PostgreSQL)
+* **Mobile:** React Native (Expo SDK 52 + React Navigation + Lucide Icons)
+* **Frontend Web:** React (Vite + Tailwind CSS + Lucide Icons)
+* **Banco de Dados:** PostgreSQL 16 (via Docker Compose)
 
-    class MobileApp {
-        <<React Native>>
-        +Views
-        +Components
-    }
+---
 
-    class API {
-        <<Presentation Layer>>
-        +Controllers
-        +Program.cs (DI Container)
-    }
+## 🛠️ Como Instalar e Rodar o Projeto (Guia Passo a Passo)
 
-    class Application {
-        <<Business Layer>>
-        +Services
-        +DTOs
-        +IRepositories
-    }
-
-    class Infrastructure {
-        <<Data Layer>>
-        +Repositories
-        +AppDbContext
-    }
-
-    class Domain {
-        <<Core Layer>>
-        +Entities
-    }
-
-    class PostgreSQL {
-        <<Database>>
-    }
-
-    MobileApp ..> API : REST JSON
-    API --> Application : Referencia
-    Infrastructure --> Application : Implementa Interfaces
-    Infrastructure --> Domain : Referencia
-    Application --> Domain : Referencia
-    API --> Infrastructure : Referencia (Apenas DI)
-    Infrastructure ..> PostgreSQL : Npgsql
-```
-
-## 📚 Documentação Adicional
-
-Todos os detalhes técnicos de especificação estão disponíveis nos seguintes documentos:
-
-- 📋 [Requisitos Funcionais e Regras de Negócio](./requisitos.md)
-- ⚙️ [Casos de Uso Detalhados](./casos%20de%20uso.md)
-- 🗄️ [Modelo de Dados Relacional](./modelo%20de%20dados.md)
-- 🏛️ [Arquitetura de Software](./arquitetura.md)
-
-## 🛠️ Como Executar
-
-### 1. Banco de Dados (Docker)
-Para subir o banco de dados PostgreSQL e o pgAdmin:
+### 1. Clonar o Repositório
 ```bash
-# Iniciar os containers em background
-docker compose up -d
-
-# Parar os containers
-docker compose down
+git clone https://github.com/MuhHyuugas/Dia5.git
+cd Dia5
 ```
 
-* **PostgreSQL:** Rodando na porta `5432` com usuário `dia5_user` e banco `dia5_db`.
-* **pgAdmin:** Acessível em `http://localhost:5050` com email `admin@dia5.com` e senha `admin`.
+---
 
-### 2. Backend (.NET 10 API)
-Para restaurar as dependências e iniciar o servidor da API:
+### 2. Iniciar o Banco de Dados (PostgreSQL + Docker)
+Certifique-se de ter o Docker/Docker Desktop rodando em sua máquina e execute:
+```bash
+docker compose up -d
+```
+> O banco estará rodando na porta `5432` com usuário `dia5_user` e banco `dia5_db`. OpgAdmin ficará disponível em `http://localhost:5050` (`admin@dia5.com` / `admin`).
+
+---
+
+### 3. Backend (NestJS API)
+Abra um terminal na raiz do repositório:
 ```bash
 # Entrar na pasta do backend
 cd backend
 
-# Restaurar pacotes NuGet
-dotnet restore
+# Instalar as dependências
+npm install
 
-# Executar a API
-dotnet run --project Dia5.API
+# Iniciar o servidor em modo de desenvolvimento (Watch Mode)
+npm run start:dev
 ```
-A API estará acessível por padrão em `http://localhost:5000` ou `https://localhost:5001`.
+> A API estará rodando em `http://localhost:3000/api`.
 
-### 3. Migrações do Entity Framework Core
-Se precisar criar ou aplicar novas migrações de banco de dados:
+---
+
+### 4. Aplicativo Mobile (React Native + Expo)
+Abra um novo terminal na raiz do repositório:
 ```bash
-# Instalar a ferramenta CLI do EF Core globalmente (caso não possua)
-dotnet tool install --global dotnet-ef
+# Entrar na pasta do aplicativo mobile
+cd mobile
 
-# Aplicar migrações existentes no banco de dados
-dotnet ef database update --project Dia5.Infrastructure --startup-project Dia5.API
+# Instalar as dependências
+npm install
+
+# Iniciar o servidor de desenvolvimento Expo
+npx expo start
 ```
+> **Como testar:**
+> - **Celular Físico:** Abra o aplicativo **Expo Go** (iOS/Android) e escaneie o código QR exibido no terminal.
+> - **Emulador Android / iOS Simulator:** Pressione `a` para Android ou `i` para iOS no terminal do Expo.
 
-### 4. Frontend (Vite + React)
-Para rodar o frontend de teste:
+---
+
+### 5. Frontend Web (React + Vite)
+Abra um novo terminal na raiz do repositório:
 ```bash
-# Entrar na pasta do frontend
-cd front-teste/splitwise-premium
+# Entrar na pasta do frontend web
+cd frontend
 
 # Instalar as dependências
 npm install
@@ -140,4 +108,10 @@ npm install
 # Iniciar o servidor de desenvolvimento
 npm run dev
 ```
-O frontend estará acessível em `http://localhost:3000`.
+> A aplicação Web estará acessível em `http://localhost:5173`.
+
+---
+
+## 📄 Licença e Contribuição
+
+Projeto desenvolvido para gestão inteligente de contas em grupo. Fique à vontade para testar, abrir issues e enviar pull requests com melhorias! 🚀

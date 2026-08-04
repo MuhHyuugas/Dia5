@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { authService } from '../services/auth.service';
-import { LogOut, Copy, Check, User as UserIcon } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
+import { LogOut, Copy, Check, User as UserIcon, Sun, Moon } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const user = authService.getCurrentUser();
+  const { isDark, toggleTheme } = useTheme();
   const [copied, setCopied] = useState(false);
 
   const handleCopyCode = () => {
@@ -28,7 +30,7 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Profile Code Badge & Logout */}
+        {/* Controls */}
         <div className="flex items-center gap-1.5">
           {user?.codigoPerfil && (
             <button
@@ -40,6 +42,15 @@ export const Header: React.FC = () => {
               {copied ? <Check className="w-3 h-3 text-secondary" /> : <Copy className="w-3 h-3" />}
             </button>
           )}
+
+          {/* Toggle de Tema */}
+          <button
+            onClick={toggleTheme}
+            className="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+            title={isDark ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
 
           <button
             onClick={() => authService.logout()}

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateGuestUserDto } from './dto/create-guest.dto';
@@ -12,6 +12,11 @@ export class UsersController {
   @Get('me')
   async getProfile(@Request() req: any) {
     return this.usersService.getProfile(req.user.userId);
+  }
+
+  @Put('me')
+  async updateProfile(@Request() req: any, @Body() body: { nome?: string; fotoUrl?: string }) {
+    return this.usersService.updateProfile(req.user.userId, body);
   }
 
   @Post('guests')

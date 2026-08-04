@@ -135,12 +135,14 @@ export class GroupsService {
       order: { createdAt: 'DESC' },
     });
 
-    // Busca pagamentos/liquidações do grupo
+    // Busca pagamentos/liquidações do grupo (filtrando autopagamentos inválidos)
     const payments = await this.paymentRepository.find({
       where: { grupoId: groupId },
       relations: { pagador: true, recebedor: true },
       order: { createdAt: 'DESC' },
     });
+
+    const validPayments = payments.filter((p) => p.pagadorId && p.recebedorId && p.pagadorId !== p.recebedorId);
 
     // Consolida timeline cronológica (RF08)
     const activities = [
@@ -152,7 +154,7 @@ export class GroupsService {
         pagador: e.pagador?.nome,
         data: e.createdAt,
       })),
-      ...payments.map((p) => ({
+      ...validPayments.map((p) => ({
         tipo: 'PAGAMENTO',
         id: p.id,
         valorPago: p.valorPago,

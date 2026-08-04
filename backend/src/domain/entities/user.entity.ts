@@ -17,6 +17,9 @@ export class User {
   @Column({ type: 'varchar', length: 6, unique: true, nullable: true, name: 'codigo_perfil' })
   codigoPerfil: string | null;
 
+  @Column({ type: 'varchar', nullable: true, name: 'foto_url' })
+  fotoUrl: string | null;
+
   @Column({ type: 'boolean', default: false, name: 'is_guest' })
   isGuest: boolean;
 
