@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from '../src/app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from '../src/common/filters/http-exception.filter';
 import express from 'express';
 
 const server = express();
@@ -16,12 +17,15 @@ async function bootstrap() {
     );
 
     app.enableCors();
+    app.setGlobalPrefix('api');
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
+        forbidNonWhitelisted: false,
         transform: true,
       }),
     );
+    app.useGlobalFilters(new AllExceptionsFilter());
 
     await app.init();
     cachedServer = server;

@@ -23,24 +23,49 @@ import { PaymentsModule } from './modules/payments/payments.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DB_HOST', 'localhost'),
-        port: configService.get<number>('DB_PORT', 5432),
-        username: configService.get<string>('DB_USERNAME', 'dia5_user'),
-        password: configService.get<string>('DB_PASSWORD', 'dia5_password'),
-        database: configService.get<string>('DB_DATABASE', 'dia5_db'),
-        entities: [
-          User,
-          Friendship,
-          Group,
-          GroupMember,
-          Expense,
-          ExpenseParticipant,
-          Payment,
-        ],
-        synchronize: true, // Sincroniza entidades com o banco automaticamente
-      }),
+      useFactory: (configService: ConfigService) => {
+        const dbUrl = configService.get<string>('DATABASE_URL');
+        const dbSsl = configService.get<string>('DB_SSL');
+        const isSslEnabled = dbSsl === 'true' || (dbSsl !== 'false' && !!dbUrl);
+
+        if (dbUrl) {
+          return {
+            type: 'postgres',
+            url: dbUrl,
+            entities: [
+              User,
+              Friendship,
+              Group,
+              GroupMember,
+              Expense,
+              ExpenseParticipant,
+              Payment,
+            ],
+            synchronize: true,
+            ssl: isSslEnabled ? { rejectUnauthorized: false } : false,
+          };
+        }
+
+        return {
+          type: 'postgres',
+          host: configService.get<string>('DB_HOST', 'localhost'),
+          port: configService.get<number>('DB_PORT', 5432),
+          username: configService.get<string>('DB_USERNAME', 'dia5_user'),
+          password: configService.get<string>('DB_PASSWORD', 'dia5_password'),
+          database: configService.get<string>('DB_DATABASE', 'dia5_db'),
+          entities: [
+            User,
+            Friendship,
+            Group,
+            GroupMember,
+            Expense,
+            ExpenseParticipant,
+            Payment,
+          ],
+          synchronize: true,
+          ssl: isSslEnabled ? { rejectUnauthorized: false } : false,
+        };
+      },
     }),
     AuthModule,
     UsersModule,
