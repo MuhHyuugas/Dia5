@@ -26,6 +26,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
       useFactory: (configService: ConfigService) => {
         const dbUrl =
           configService.get<string>('DATABASE_URL') ||
+          configService.get<string>('POSTGRES_URL_NON_POOLING') ||
           configService.get<string>('POSTGRES_URL') ||
           configService.get<string>('SUPABASE_DATABASE_URL');
         const dbSsl = configService.get<string>('DB_SSL');
