@@ -4,8 +4,8 @@ import { LayoutDashboard, Users, UsersRound, ReceiptText, UserCheck } from 'luci
 
 export const Navbar: React.FC = () => {
   return (
-    <nav className="absolute bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-outline py-2 px-3 shadow-lg">
-      <div className="flex justify-around items-center">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-surface/95 backdrop-blur-md border-t border-outline py-2 px-3 shadow-lg">
+      <div className="flex justify-around items-center max-w-md mx-auto">
         <NavLink
           to="/"
           end

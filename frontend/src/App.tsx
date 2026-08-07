@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom
 import { authService } from './services/auth.service';
 import { Header } from './components/Header';
 import { Navbar } from './components/Navbar';
-import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
@@ -15,21 +15,11 @@ import { Friends } from './pages/Friends';
 import { Activity } from './pages/Activity';
 import { Account } from './pages/Account';
 
-// Shell Responsivo Mobile-First (Dispositivo Móvel Centrado em Telas Grandes)
-const MobileShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isDark } = useTheme();
+// Shell Web Responsivo Full Screen
+const WebShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className={`min-h-screen flex items-center justify-center p-0 md:p-6 antialiased selection:bg-primary/30 shell-outer ${isDark ? 'bg-slate-950' : 'bg-slate-200'}`}>
-      {/* Container simulando um smartphone em telas grandes e 100% full screen no celular */}
-      <div className={`w-full max-w-md min-h-screen md:min-h-[844px] md:max-h-[920px] bg-background text-on-surface flex flex-col md:rounded-[40px] md:shadow-2xl md:border-8 relative overflow-hidden ${isDark ? 'md:border-slate-800' : 'md:border-slate-300'}`}>
-        {/* Notch / Speaker visual apenas no desktop */}
-        <div className={`hidden md:flex justify-center pt-2 pb-1 bg-surface z-50`}>
-          <div className={`w-24 h-4 rounded-full flex items-center justify-center ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
-            <div className={`w-3 h-1 rounded-full ${isDark ? 'bg-slate-700' : 'bg-slate-300'}`}></div>
-          </div>
-        </div>
-        {children}
-      </div>
+    <div className="min-h-screen bg-background text-on-surface flex flex-col antialiased selection:bg-primary/30 w-full relative">
+      {children}
     </div>
   );
 };
@@ -41,23 +31,23 @@ const ProtectedLayout: React.FC = () => {
   }
 
   return (
-    <MobileShell>
+    <WebShell>
       <Header />
-      <main className="flex-1 px-4 pt-4 pb-24 overflow-y-auto custom-scrollbar">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-8">
         <Outlet />
       </main>
       <Navbar />
-    </MobileShell>
+    </WebShell>
   );
 };
 
 const PublicLayout: React.FC = () => {
   return (
-    <MobileShell>
-      <div className="flex-1 overflow-y-auto">
+    <WebShell>
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 w-full min-h-screen">
         <Outlet />
-      </div>
-    </MobileShell>
+      </main>
+    </WebShell>
   );
 };
 
