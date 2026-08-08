@@ -4,6 +4,7 @@ import { AppModule } from '../src/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from '../src/common/filters/http-exception.filter';
 import express from 'express';
+import 'pg'; // Força o Vercel a empacotar o driver do Postgres!
 
 const server = express();
 
