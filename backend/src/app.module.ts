@@ -57,8 +57,9 @@ import { PaymentsModule } from './modules/payments/payments.module';
           dbSsl === 'true' || (dbSsl !== 'false' && (!isLocalhost || !!dbUrl));
 
         if (dbUrl) {
-          // Remove query params (como ?sslmode=require) que sobrescrevem o nosso ssl: { rejectUnauthorized: false }
-          const cleanDbUrl = dbUrl.split('?')[0];
+          // Remove query params e força sslmode=no-verify para funcionar com Supabase
+          const baseUrl = dbUrl.split('?')[0];
+          const cleanDbUrl = `${baseUrl}?sslmode=no-verify`;
 
           return {
             type: 'postgres',
