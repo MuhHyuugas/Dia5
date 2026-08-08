@@ -71,6 +71,13 @@ import { PaymentsModule } from './modules/payments/payments.module';
             ],
             synchronize: true,
             ssl: isSslEnabled ? { rejectUnauthorized: false } : false,
+            extra: isSslEnabled
+              ? {
+                  ssl: {
+                    rejectUnauthorized: false,
+                  },
+                }
+              : {},
           };
         }
 
@@ -92,6 +99,13 @@ import { PaymentsModule } from './modules/payments/payments.module';
           ],
           synchronize: true,
           ssl: isSslEnabled ? { rejectUnauthorized: false } : false,
+          extra: isSslEnabled
+            ? {
+                ssl: {
+                  rejectUnauthorized: false,
+                },
+              }
+            : {},
         };
       },
     }),
