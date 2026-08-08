@@ -57,9 +57,12 @@ import { PaymentsModule } from './modules/payments/payments.module';
           dbSsl === 'true' || (dbSsl !== 'false' && (!isLocalhost || !!dbUrl));
 
         if (dbUrl) {
+          // Remove query params (como ?sslmode=require) que sobrescrevem o nosso ssl: { rejectUnauthorized: false }
+          const cleanDbUrl = dbUrl.split('?')[0];
+
           return {
             type: 'postgres',
-            url: dbUrl,
+            url: cleanDbUrl,
             entities: [
               User,
               Friendship,
