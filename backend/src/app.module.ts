@@ -57,9 +57,9 @@ import { PaymentsModule } from './modules/payments/payments.module';
           dbSsl === 'true' || (dbSsl !== 'false' && (!isLocalhost || !!dbUrl));
 
         if (dbUrl) {
-          // Remove query params e força sslmode=no-verify para funcionar com Supabase
+          // Usa parâmetro recomendado pelo driver pg para conexão segura sem verificar certificado
           const baseUrl = dbUrl.split('?')[0];
-          const cleanDbUrl = `${baseUrl}?sslmode=no-verify`;
+          const cleanDbUrl = `${baseUrl}?sslmode=require&uselibpqcompat=true`;
 
           return {
             type: 'postgres',
