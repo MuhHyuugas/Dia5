@@ -29,8 +29,32 @@ import { PaymentsModule } from './modules/payments/payments.module';
           configService.get<string>('POSTGRES_URL_NON_POOLING') ||
           configService.get<string>('POSTGRES_URL') ||
           configService.get<string>('SUPABASE_DATABASE_URL');
+
+        const host =
+          configService.get<string>('DB_HOST') ||
+          configService.get<string>('POSTGRES_HOST') ||
+          'localhost';
+        const port =
+          configService.get<number>('DB_PORT') ||
+          configService.get<number>('POSTGRES_PORT') ||
+          5432;
+        const username =
+          configService.get<string>('DB_USERNAME') ||
+          configService.get<string>('POSTGRES_USER') ||
+          'dia5_user';
+        const password =
+          configService.get<string>('DB_PASSWORD') ||
+          configService.get<string>('POSTGRES_PASSWORD') ||
+          'dia5_password';
+        const database =
+          configService.get<string>('DB_DATABASE') ||
+          configService.get<string>('POSTGRES_DATABASE') ||
+          'dia5_db';
+
         const dbSsl = configService.get<string>('DB_SSL');
-        const isSslEnabled = dbSsl === 'true' || (dbSsl !== 'false' && !!dbUrl);
+        const isLocalhost = host === 'localhost' || host === '127.0.0.1';
+        const isSslEnabled =
+          dbSsl === 'true' || (dbSsl !== 'false' && (!isLocalhost || !!dbUrl));
 
         if (dbUrl) {
           return {
@@ -52,11 +76,11 @@ import { PaymentsModule } from './modules/payments/payments.module';
 
         return {
           type: 'postgres',
-          host: configService.get<string>('DB_HOST', 'localhost'),
-          port: configService.get<number>('DB_PORT', 5432),
-          username: configService.get<string>('DB_USERNAME', 'dia5_user'),
-          password: configService.get<string>('DB_PASSWORD', 'dia5_password'),
-          database: configService.get<string>('DB_DATABASE', 'dia5_db'),
+          host,
+          port: Number(port),
+          username,
+          password,
+          database,
           entities: [
             User,
             Friendship,
