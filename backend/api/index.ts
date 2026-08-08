@@ -6,6 +6,10 @@ import { AllExceptionsFilter } from '../src/common/filters/http-exception.filter
 import express from 'express';
 import 'pg'; // Força o Vercel a empacotar o driver do Postgres!
 
+// Desabilita verificação de certificado TLS globalmente para conexão com Supabase
+// Necessário pois o Supabase usa certificado intermediário não reconhecido pelo Node
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const server = express();
 
 let cachedServer: any;
