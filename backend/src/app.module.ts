@@ -73,7 +73,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
               ExpenseParticipant,
               Payment,
             ],
-            synchronize: false,
+            synchronize: true,
             ssl: isSslEnabled ? { rejectUnauthorized: false } : false,
             extra: isSslEnabled
               ? {
